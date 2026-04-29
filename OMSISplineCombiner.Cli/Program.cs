@@ -8,7 +8,7 @@ internal class Program
     {
         try
         { 
-            var app = new OmsiSplineCombinerApp() { SplinesSourceDirectory = @"Splines\Test_skrzyzowania" };
+            var app = new OmsiSplineCombinerApp();
             app.Run();
         }
         catch(Exception ex)

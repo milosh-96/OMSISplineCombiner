@@ -8,27 +8,17 @@ public class OmsiSplineCombinerApp
 {
     public bool FirstRun = true;
     public string OmsiDirectory { get; init; } = @"C:\Program Files (x86)\Steam\steamapps\common\OMSI 2\";
-    public string SplinesSourceDirectory { get; init; } = @"Splines\";
-    public string DestinationDirectory { get; init; } = @"CombinedSplines";
+    public string SplinesSourceDirectory { get; init; } = @"Splines\ADDON_SimpleStreets";
+    public string DestinationDirectory { get; init; } = @"MySplines";
 
     //private List<string> _files = ["Chodnik_kraweznik_1,5m.sli", "Asfalt_3m.sli", "linia_przerywana.sli"];
     private List<string> _files = new();
     
-    public void OMSISplineCombiner()
-    {
-        if(FirstRun)
-        {
-            // Get the config from the user
-        }
-        else
-        {
-            // Read from the config file
-        }
-    }
-
-    
+      
     public void Run()
     {
+        LoadConfiguration();
+
         string? input = "";
         do
         {
@@ -194,5 +184,29 @@ public class OmsiSplineCombinerApp
         }
 
         return positions;
+    }
+
+    private void LoadConfiguration()
+    {
+        if (FirstRun)
+        {
+            SetConfiguration();
+        }
+        else
+        {
+            // Read from the config file
+        }
+    }
+
+    private void SetConfiguration()
+    {
+        Console.WriteLine($"Enter path to your OMSI directory. Default: {OmsiDirectory}");
+        string? omsiPath = Console.ReadLine();
+
+        Console.WriteLine($"Enter path to your splines directory. Default: {SplinesSourceDirectory}");
+        string? splinesSourceDirectory = Console.ReadLine();
+
+        Console.WriteLine($"Enter path where new splines will be saved. Default: {DestinationDirectory}");
+        string? desinationDirectory = Console.ReadLine();
     }
 }
