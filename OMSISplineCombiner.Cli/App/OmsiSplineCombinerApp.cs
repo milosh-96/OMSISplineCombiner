@@ -6,14 +6,30 @@ namespace OMSISplineCombiner.Cli.App;
 
 public class OmsiSplineCombinerApp
 {
+    public bool FirstRun = true;
     public string OmsiDirectory { get; init; } = @"C:\Program Files (x86)\Steam\steamapps\common\OMSI 2\";
     public string SplinesSourceDirectory { get; init; } = @"Splines\";
+    public string DestinationDirectory { get; init; } = @"CombinedSplines";
 
     //private List<string> _files = ["Chodnik_kraweznik_1,5m.sli", "Asfalt_3m.sli", "linia_przerywana.sli"];
     private List<string> _files = new();
+    
+    public void OMSISplineCombiner()
+    {
+        if(FirstRun)
+        {
+            // Get the config from the user
+        }
+        else
+        {
+            // Read from the config file
+        }
+    }
+
+    
     public void Run()
     {
-        string input = "";
+        string? input = "";
         do
         {
 
@@ -49,13 +65,16 @@ public class OmsiSplineCombinerApp
         {
             var spline = splines[i];
             spline.Textures.ForEach(texture => { if (!textures.Contains(texture)) { textures.Add(texture); } });
-            float offset = float.Parse(Console.ReadLine());
+            string? offsetInput = Console.ReadLine();
+            if(offsetInput is null) { throw new ArgumentNullException(nameof(offsetInput)); }
+            float offset = float.Parse(offsetInput);
             spline.HeightProfiles.ForEach(profile => { profile.FromX += offset; profile.ToX += offset; });
             spline.Profiles.ForEach(
                     profile =>
                     {
                         profile.TextureName = spline.Textures[profile.TextureId].Name;
-                        profile.TextureId = textures.IndexOf(textures.FirstOrDefault(texture => texture.Name == profile.TextureName));
+                        Texture? texture = textures.FirstOrDefault(texture => texture.Name == profile.TextureName) ?? throw new NullReferenceException("Couldn't find a texture.");
+                        profile.TextureId = textures.IndexOf(texture);
                         //if(i > 0)
                         //{
                         //    profile.TextureId += 1 + splines[i-1].Profiles.Max(profile=>profile.TextureId);
@@ -110,7 +129,7 @@ public class OmsiSplineCombinerApp
     {
         List<int> positions = FetchPositionsOfAttribute("texture", fileContents);
         List<Texture> textures = new List<Texture>(positions.Count);
-        int textureIndex = 0;
+
         foreach (int position in positions)
         {
             var data = fileContents.Skip(position + 1).Take(1).ToList();

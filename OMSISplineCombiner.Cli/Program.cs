@@ -7,7 +7,7 @@ internal class Program
     static void Main(string[] args)
     {
         try
-        {
+        { 
             var app = new OmsiSplineCombinerApp() { SplinesSourceDirectory = @"Splines\Test_skrzyzowania" };
             app.Run();
         }

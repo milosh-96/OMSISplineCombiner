@@ -3,7 +3,7 @@
 public class Profile
 {
     public int TextureId { get; set; }
-    public string TextureName { get; set; }
+    public string? TextureName { get; set; }
 
     public List<ProfilePoint> Points { get; init; } = new List<ProfilePoint>();
 
