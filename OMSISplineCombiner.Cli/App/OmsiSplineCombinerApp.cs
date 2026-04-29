@@ -73,7 +73,7 @@ public class OmsiSplineCombinerApp
                     profile =>
                     {
                         profile.TextureName = spline.Textures[profile.TextureId].Name;
-                        Texture? texture = textures.FirstOrDefault(texture => texture.Name == profile.TextureName) ?? throw new NullReferenceException("Couldn't find a texture.");
+                        Texture? texture = textures.FirstOrDefault(texture => texture.Name == profile.TextureName) ?? throw new InvalidOperationException("Couldn't find a texture.");
                         profile.TextureId = textures.IndexOf(texture);
                         //if(i > 0)
                         //{
