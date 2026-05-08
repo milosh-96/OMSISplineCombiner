@@ -25,6 +25,9 @@ public static class SplineWriter
         writer.WriteLine(
             string.Join('\n', spline.Profiles.Select(profile => profile.Output())) + '\n'
             );
+        writer.WriteLine(
+            string.Join('\n', spline.Paths.Select(path => path.Output())) + '\n'
+            );
     }
 
     [Obsolete]

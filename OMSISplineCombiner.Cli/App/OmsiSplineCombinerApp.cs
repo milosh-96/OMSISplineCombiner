@@ -8,13 +8,13 @@ public class OmsiSplineCombinerApp
 {
     public bool FirstRun = true;
     public string OmsiDirectory { get; init; } = @"C:\Program Files (x86)\Steam\steamapps\common\OMSI 2\";
-    public string SplinesSourceDirectory { get; init; } = @"Splines\ADDON_SimpleStreets";
-    public string DestinationDirectory { get; init; } = @"MySplines";
+    public string SplinesSourceDirectory { get; init; } = @"Splines\BS_ADDON_CreativeStreets\Gehwege";
+    public string DestinationDirectory { get; init; } = @"Splines\MySplines";
 
     //private List<string> _files = ["Chodnik_kraweznik_1,5m.sli", "Asfalt_3m.sli", "linia_przerywana.sli"];
     private List<string> _files = new();
-    
-      
+
+
     public void Run()
     {
         LoadConfiguration();
@@ -46,6 +46,7 @@ public class OmsiSplineCombinerApp
                 HeightProfiles = ReadHeightProfile(fileContents),
                 Textures = ReadTextures(fileContents),
                 Profiles = ReadProfiles(fileContents),
+                Paths = ReadPaths(fileContents)
             };
             splines.Add(spline);
         }
@@ -55,8 +56,9 @@ public class OmsiSplineCombinerApp
         {
             var spline = splines[i];
             spline.Textures.ForEach(texture => { if (!textures.Contains(texture)) { textures.Add(texture); } });
+            Console.WriteLine($"Enter the offset for the current spline (#{i + 1})");
             string? offsetInput = Console.ReadLine();
-            if(offsetInput is null) { throw new ArgumentNullException(nameof(offsetInput)); }
+            if (offsetInput is null) { throw new ArgumentNullException(nameof(offsetInput)); }
             float offset = float.Parse(offsetInput);
             spline.HeightProfiles.ForEach(profile => { profile.FromX += offset; profile.ToX += offset; });
             spline.Profiles.ForEach(
@@ -73,6 +75,12 @@ public class OmsiSplineCombinerApp
                             point => point.PositionX += offset
                     );
                     });
+            spline.Paths.ForEach(
+                    path =>
+                    {
+                        path.PositionX += offset;
+                    });
+
             texturesCount = spline.Textures.Count;
         }
 
@@ -81,7 +89,7 @@ public class OmsiSplineCombinerApp
         {
             completeSpline.HeightProfiles.AddRange(spline.HeightProfiles);
             completeSpline.Profiles.AddRange(spline.Profiles);
-
+            completeSpline.Paths.AddRange(spline.Paths);
             Console.WriteLine('+' +
                 string.Join(',', string.Join(',', spline.Profiles.Select(profile => profile.TextureName))));
         }
@@ -91,7 +99,10 @@ public class OmsiSplineCombinerApp
         stopwatch.Stop();
 
         //Console.WriteLine(string.Join(',',textures));
-        SplineWriter.Write($"{OmsiDirectory + SplinesSourceDirectory}\\{Guid.NewGuid().ToString()}.sli", completeSpline);
+        string newSplinePath = $"{OmsiDirectory}{DestinationDirectory}\\{Guid.NewGuid().ToString()}.sli";
+        EnsureDirectoryExists(newSplinePath);
+        SplineWriter.Write(newSplinePath, completeSpline);
+        Console.WriteLine(newSplinePath);
         Console.ReadKey();
 
     }
@@ -132,6 +143,26 @@ public class OmsiSplineCombinerApp
         }
         return textures;
     }
+    private static List<OmsiPath> ReadPaths(string[] fileContents)
+    {
+        List<int> positions = FetchPositionsOfAttribute("path", fileContents);
+        List<OmsiPath> paths = new List<OmsiPath>(positions.Count);
+
+        foreach (int position in positions)
+        {
+            var data = fileContents.Skip(position + 1).Take(5).ToList();
+            OmsiPath path = new OmsiPath()
+            {
+                Type = (OmsiPathType)Enum.Parse(typeof(OmsiPathType), data[0]),
+                PositionX = float.Parse(data[1]),
+                PositionZ = float.Parse(data[2]),
+                Width = float.Parse(data[3]),
+                Direction = (OmsiPathDirection)Enum.Parse(typeof(OmsiPathDirection), data[4])
+            };
+            paths.Add(path);
+        }
+        return paths;
+    }
 
     private static List<Profile> ReadProfiles(string[] fileContents)
     {
@@ -141,7 +172,16 @@ public class OmsiSplineCombinerApp
         {
             var data = fileContents.Skip(position + 1).Take(1).ToList();
             var profilePointContents = new List<string>();
-            List<string> profileFileContents = fileContents.Skip(position + 1).ToList();
+            List<string> profileFileContents = new List<string>();
+            
+            foreach(string line in fileContents.Skip(position + 1).ToList())
+            {
+                if(line.Contains("[profile]"))
+                {
+                    break;
+                }
+                profileFileContents.Add(line);
+            }
 
             List<ProfilePoint> profilePoints = new List<ProfilePoint>();
 
@@ -184,6 +224,15 @@ public class OmsiSplineCombinerApp
         }
 
         return positions;
+    }
+
+    private static void EnsureDirectoryExists(string filePath)
+    {
+        FileInfo fi = new FileInfo(filePath);
+        if (fi.Directory == null || !fi.Directory.Exists)
+        {
+            System.IO.Directory.CreateDirectory(fi.DirectoryName!);
+        }
     }
 
     private void LoadConfiguration()
