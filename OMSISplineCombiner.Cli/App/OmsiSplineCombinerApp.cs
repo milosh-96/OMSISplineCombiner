@@ -9,8 +9,8 @@ namespace OMSISplineCombiner.Cli.App;
 public class OmsiSplineCombinerApp
 {
     public bool FirstRun = true;
-    public string OmsiDirectory { get; init; } = @"C:\Program Files (x86)\Steam\steamapps\common\OMSI 2\";
-    public string SplinesSourceDirectory { get; init; } = @"Splines\Ruede";
+    public string OmsiDirectory { get; set; } = @"C:\Program Files (x86)\Steam\steamapps\common\OMSI 2\";
+    public string SplinesSourceDirectory { get; init; } = @"Splines\";
     public string DestinationDirectory { get; init; } = @"Splines\MySplines";
 
     //private List<string> _files = ["Chodnik_kraweznik_1,5m.sli", "Asfalt_3m.sli", "linia_przerywana.sli"];
