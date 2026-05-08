@@ -8,7 +8,7 @@ public class OmsiSplineCombinerApp
 {
     public bool FirstRun = true;
     public string OmsiDirectory { get; init; } = @"C:\Program Files (x86)\Steam\steamapps\common\OMSI 2\";
-    public string SplinesSourceDirectory { get; init; } = @"Splines\BS_ADDON_CreativeStreets\Gehwege";
+    public string SplinesSourceDirectory { get; init; } = @"Splines\Ruede";
     public string DestinationDirectory { get; init; } = @"Splines\MySplines";
 
     //private List<string> _files = ["Chodnik_kraweznik_1,5m.sli", "Asfalt_3m.sli", "linia_przerywana.sli"];
@@ -23,7 +23,7 @@ public class OmsiSplineCombinerApp
         do
         {
 
-            Console.WriteLine($"Enter path to your spline ({SplinesSourceDirectory}/...)");
+            Console.WriteLine($"Enter path to your spline ({SplinesSourceDirectory}/...). If you want to repeat one spline multiple times, add them again. Press 'f' if you finished adding splines.");
             input = Console.ReadLine();
             if (!string.IsNullOrEmpty(input))
             {
@@ -94,7 +94,12 @@ public class OmsiSplineCombinerApp
                 string.Join(',', string.Join(',', spline.Profiles.Select(profile => profile.TextureName))));
         }
         completeSpline.Textures.AddRange(textures);
-
+        
+        foreach(Texture texture in completeSpline.Textures)
+        {
+            EnsureDirectoryExists($"{OmsiDirectory}{DestinationDirectory}\\texture\\{texture}");
+            File.Copy($"{OmsiDirectory}{SplinesSourceDirectory}\\texture\\{texture}", $"{OmsiDirectory}{DestinationDirectory}\\texture\\{texture}");
+        }
 
         stopwatch.Stop();
 
@@ -133,14 +138,38 @@ public class OmsiSplineCombinerApp
 
         foreach (int position in positions)
         {
-            var data = fileContents.Skip(position + 1).Take(1).ToList();
+            var textureContents = fileContents.Skip(position + 1);
+            var data = textureContents.Take(1).ToList();
+            PatchworkChain? patchworkChain = null;
+            var patchworkChainPositions = FetchPositionsOfAttribute("patchwork_chain", textureContents.ToArray());
+            
+            foreach(int patchworkChainPosition in patchworkChainPositions) { 
+                var patchworkChainData = textureContents.Skip(patchworkChainPosition + 1).Take(4).ToList();
+                try
+                {
+                    patchworkChain = new PatchworkChain()
+                    {
+                        SegmentLength = int.Parse(patchworkChainData[0]),
+                        ChainOfTransitions = patchworkChainData[1],
+                        ChainOfWeightFactors = patchworkChainData[2],
+                        Invertable = patchworkChainData[3]
+                    };
+                }
+                catch(FormatException ex)
+                {
+                    Console.WriteLine(ex.Message);
+                    continue;
+                }
+            }
             Texture texture = new Texture()
             {
                 Id = 0,
-                Name = data[0]
+                Name = data[0],
+                PatchworkChain = patchworkChain
             };
             textures.Add(texture);
         }
+
         return textures;
     }
     private static List<OmsiPath> ReadPaths(string[] fileContents)
@@ -217,7 +246,7 @@ public class OmsiSplineCombinerApp
 
         for (int i = 0; i < fileContents.Count(); i++)
         {
-            if (fileContents[i].Contains($"[{attribute}]"))
+            if (fileContents[i].Trim() == $"[{attribute}]")
             {
                 positions.Add(i);
             }
