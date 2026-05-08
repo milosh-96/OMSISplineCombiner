@@ -4,6 +4,7 @@ public class Texture : IEquatable<Texture>
 {
     public int Id { get; set; }
     public string Name { get; set; } = "";
+    public string FolderPath { get; set; } = "/";
 
     public PatchworkChain? PatchworkChain { get; set; }
 

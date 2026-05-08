@@ -1,6 +1,8 @@
 ﻿using OMSISplineCombiner.Cli.Data;
 using OMSISplineCombiner.Cli.Writers;
 using System.Diagnostics;
+using System.IO;
+using System.Text.RegularExpressions;
 
 namespace OMSISplineCombiner.Cli.App;
 
@@ -13,7 +15,6 @@ public class OmsiSplineCombinerApp
 
     //private List<string> _files = ["Chodnik_kraweznik_1,5m.sli", "Asfalt_3m.sli", "linia_przerywana.sli"];
     private List<string> _files = new();
-
 
     public void Run()
     {
@@ -34,7 +35,6 @@ public class OmsiSplineCombinerApp
             }
         }
         while (input is null || input.ToLower() != "f");
-        Stopwatch stopwatch = Stopwatch.StartNew();
         var splines = new List<Spline>();
         List<Texture> textures = new List<Texture>();
 
@@ -44,7 +44,7 @@ public class OmsiSplineCombinerApp
             var spline = new Spline()
             {
                 HeightProfiles = ReadHeightProfile(fileContents),
-                Textures = ReadTextures(fileContents),
+                Textures = ReadTextures(fileContents, Regex.Match(_file, @".*(?=[\\/])").Value),
                 Profiles = ReadProfiles(fileContents),
                 Paths = ReadPaths(fileContents)
             };
@@ -98,11 +98,13 @@ public class OmsiSplineCombinerApp
         foreach(Texture texture in completeSpline.Textures)
         {
             EnsureDirectoryExists($"{OmsiDirectory}{DestinationDirectory}\\texture\\{texture}");
-            File.Copy($"{OmsiDirectory}{SplinesSourceDirectory}\\texture\\{texture}", $"{OmsiDirectory}{DestinationDirectory}\\texture\\{texture}");
-            File.Copy($"{OmsiDirectory}{SplinesSourceDirectory}\\texture\\{texture}.cfg", $"{OmsiDirectory}{DestinationDirectory}\\texture\\{texture}.cfg");
-        }
+            EnsureDirectoryExists($"{OmsiDirectory}{DestinationDirectory}\\texture\\WinterSnow\\{texture}");
+            EnsureDirectoryExists($"{OmsiDirectory}{DestinationDirectory}\\texture\\WinterSnowfall\\{texture}");
 
-        stopwatch.Stop();
+            CopyTextureFile($"{OmsiDirectory}{SplinesSourceDirectory}\\{texture.FolderPath}\\texture\\{texture}", $"{OmsiDirectory}{DestinationDirectory}\\texture\\{texture}");
+            CopyTextureFile($"{OmsiDirectory}{SplinesSourceDirectory}\\{texture.FolderPath}\\texture\\WinterSnow\\{texture}", $"{OmsiDirectory}{DestinationDirectory}\\texture\\WinterSnow\\{texture}");
+            CopyTextureFile($"{OmsiDirectory}{SplinesSourceDirectory}\\{texture.FolderPath}\\texture\\WinterSnowfall\\{texture}", $"{OmsiDirectory}{DestinationDirectory}\\texture\\WinterSnowfall\\{texture}");
+        }
 
         //Console.WriteLine(string.Join(',',textures));
         string newSplinePath = $"{OmsiDirectory}{DestinationDirectory}\\{Guid.NewGuid().ToString()}.sli";
@@ -132,7 +134,7 @@ public class OmsiSplineCombinerApp
         return heightProfiles;
     }
 
-    private static List<Texture> ReadTextures(string[] fileContents)
+    private static List<Texture> ReadTextures(string[] fileContents, string splineFolderPath = "/")
     {
         List<int> positions = FetchPositionsOfAttribute("texture", fileContents);
         List<Texture> textures = new List<Texture>(positions.Count);
@@ -166,6 +168,7 @@ public class OmsiSplineCombinerApp
             {
                 Id = 0,
                 Name = data[0],
+                FolderPath = splineFolderPath,
                 PatchworkChain = patchworkChain
             };
             textures.Add(texture);
@@ -254,6 +257,21 @@ public class OmsiSplineCombinerApp
         }
 
         return positions;
+    }
+
+    private void CopyTextureFile(string path, string destination)
+    {
+        if(File.Exists(path))
+        {
+            File.Copy(path, destination, true);
+            
+            var cfgFile = path + ".cfg";
+
+            if (File.Exists(cfgFile))
+            {
+                File.Copy(cfgFile, destination + ".cfg", true);
+            }
+        }
     }
 
     private static void EnsureDirectoryExists(string filePath)
