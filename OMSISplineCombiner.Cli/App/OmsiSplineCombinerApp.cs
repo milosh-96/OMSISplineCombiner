@@ -8,10 +8,9 @@ namespace OMSISplineCombiner.Cli.App;
 
 public class OmsiSplineCombinerApp
 {
-    public bool FirstRun = true;
     public string OmsiDirectory { get; set; } = @"C:\Program Files (x86)\Steam\steamapps\common\OMSI 2\";
-    public string SplinesSourceDirectory { get; init; } = @"Splines\";
-    public string DestinationDirectory { get; init; } = @"Splines\MySplines";
+    public string SplinesSourceDirectory { get; set; } = @"Splines\";
+    public string DestinationDirectory { get; set; } = @"Splines\MySplines";
 
     //private List<string> _files = ["Chodnik_kraweznik_1,5m.sli", "Asfalt_3m.sli", "linia_przerywana.sli"];
     private List<string> _files = new();
@@ -285,13 +284,26 @@ public class OmsiSplineCombinerApp
 
     private void LoadConfiguration()
     {
-        if (FirstRun)
+        var configContents = File.ReadAllLines("config.txt").ToArray();
+
+        if (configContents is null || configContents.Length == 0)
         {
             SetConfiguration();
         }
         else
         {
-            // Read from the config file
+            if (configContents[0] is not null)
+            {
+                OmsiDirectory = configContents[0];
+            }
+            if (configContents[1] is not null)
+            {
+                SplinesSourceDirectory = configContents[1];
+            }
+            if (configContents[2] is not null)
+            {
+                DestinationDirectory = configContents[2];
+            }
         }
     }
 
@@ -305,5 +317,11 @@ public class OmsiSplineCombinerApp
 
         Console.WriteLine($"Enter path where new splines will be saved. Default: {DestinationDirectory}");
         string? desinationDirectory = Console.ReadLine();
+
+        var file = File.OpenWrite("config.txt");
+        using StreamWriter writer = new StreamWriter(file);
+        writer.WriteLine(!string.IsNullOrEmpty(omsiPath) ? omsiPath : OmsiDirectory);
+        writer.WriteLine(!string.IsNullOrEmpty(splinesSourceDirectory) ? splinesSourceDirectory : SplinesSourceDirectory);
+        writer.WriteLine(!string.IsNullOrEmpty(desinationDirectory) ? desinationDirectory : DestinationDirectory);
     }
 }
