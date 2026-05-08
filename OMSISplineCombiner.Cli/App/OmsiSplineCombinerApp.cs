@@ -99,6 +99,7 @@ public class OmsiSplineCombinerApp
         {
             EnsureDirectoryExists($"{OmsiDirectory}{DestinationDirectory}\\texture\\{texture}");
             File.Copy($"{OmsiDirectory}{SplinesSourceDirectory}\\texture\\{texture}", $"{OmsiDirectory}{DestinationDirectory}\\texture\\{texture}");
+            File.Copy($"{OmsiDirectory}{SplinesSourceDirectory}\\texture\\{texture}.cfg", $"{OmsiDirectory}{DestinationDirectory}\\texture\\{texture}.cfg");
         }
 
         stopwatch.Stop();
