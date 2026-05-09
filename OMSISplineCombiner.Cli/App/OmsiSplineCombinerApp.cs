@@ -1,4 +1,5 @@
-﻿using OMSISplineCombiner.Cli.Data;
+﻿using OMSISplineCombiner.Cli.Constants;
+using OMSISplineCombiner.Cli.Data;
 using OMSISplineCombiner.Cli.Writers;
 using System.Diagnostics;
 using System.IO;
@@ -284,41 +285,37 @@ public class OmsiSplineCombinerApp
 
     private void LoadConfiguration()
     {
-        var configContents = File.ReadAllLines("config.txt").ToArray();
-
-        if (configContents is null || configContents.Length == 0)
+        if(File.Exists(AppInfo.ConfigFile))
         {
-            SetConfiguration();
-        }
-        else
-        {
-            if (configContents[0] is not null)
+            var configContents = File.ReadAllLines(AppInfo.ConfigFile).ToArray();
+            if (configContents.Length > 0 && configContents[0] is not null)
             {
                 OmsiDirectory = configContents[0];
             }
-            if (configContents[1] is not null)
+            if (configContents.Length > 1 && configContents[1] is not null)
             {
                 SplinesSourceDirectory = configContents[1];
             }
-            if (configContents[2] is not null)
+            if (configContents.Length > 2 && configContents[2] is not null)
             {
                 DestinationDirectory = configContents[2];
             }
         }
+        SetConfiguration();
     }
 
     private void SetConfiguration()
     {
-        Console.WriteLine($"Enter path to your OMSI directory. Default: {OmsiDirectory}");
+        Console.WriteLine($"Enter path to your OMSI directory. Current: {OmsiDirectory}");
         string? omsiPath = Console.ReadLine();
 
-        Console.WriteLine($"Enter path to your splines directory. Default: {SplinesSourceDirectory}");
+        Console.WriteLine($"Enter path to your splines directory. Current: {SplinesSourceDirectory}");
         string? splinesSourceDirectory = Console.ReadLine();
 
-        Console.WriteLine($"Enter path where new splines will be saved. Default: {DestinationDirectory}");
+        Console.WriteLine($"Enter path where new splines will be saved. Current: {DestinationDirectory}");
         string? desinationDirectory = Console.ReadLine();
 
-        var file = File.OpenWrite("config.txt");
+        var file = File.OpenWrite(AppInfo.ConfigFile);
         using StreamWriter writer = new StreamWriter(file);
         writer.WriteLine(!string.IsNullOrEmpty(omsiPath) ? omsiPath : OmsiDirectory);
         writer.WriteLine(!string.IsNullOrEmpty(splinesSourceDirectory) ? splinesSourceDirectory : SplinesSourceDirectory);
