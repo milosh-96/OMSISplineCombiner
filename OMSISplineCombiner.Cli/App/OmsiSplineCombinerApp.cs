@@ -1,5 +1,6 @@
 ﻿using OMSISplineCombiner.Cli.Constants;
 using OMSISplineCombiner.Cli.Data;
+using OMSISplineCombiner.Cli.Parsers;
 using OMSISplineCombiner.Cli.Writers;
 using System.Diagnostics;
 using System.IO;
@@ -20,38 +21,13 @@ public class OmsiSplineCombinerApp
     {
         LoadConfiguration();
 
-        string? input = "";
-        do
-        {
+        _files = UserInput.AskForFiles(SplinesSourceDirectory);
 
-            Console.WriteLine($"Enter path to your spline ({SplinesSourceDirectory}/...). If you want to repeat one spline multiple times, add them again. Press 'f' if you finished adding splines.");
-            input = Console.ReadLine();
-            if (!string.IsNullOrEmpty(input))
-            {
-                if (input.ToLower() != "f")
-                {
-                    _files.Add(input);
-                }
-            }
-        }
-        while (input is null || input.ToLower() != "f");
-        var splines = new List<Spline>();
         List<Texture> textures = new List<Texture>();
 
-        foreach (var _file in _files)
-        {
-            var fileContents = File.ReadAllLines(OmsiDirectory + SplinesSourceDirectory + '\\' + _file).ToArray();
-            var spline = new Spline()
-            {
-                HeightProfiles = ReadHeightProfile(fileContents),
-                Textures = ReadTextures(fileContents, Regex.Match(_file, @".*(?=[\\/])").Value),
-                Profiles = ReadProfiles(fileContents),
-                Paths = ReadPaths(fileContents)
-            };
-            splines.Add(spline);
-        }
+        var splines = SplineParser.GetSplines(_files, OmsiDirectory, SplinesSourceDirectory);
 
-        int texturesCount = splines.First().Textures.Count;
+        // todo: extract stuff from this main method
         for (int i = 0; i < splines.Count; i++)
         {
             var spline = splines[i];
@@ -80,8 +56,6 @@ public class OmsiSplineCombinerApp
                     {
                         path.PositionX += offset;
                     });
-
-            texturesCount = spline.Textures.Count;
         }
 
         var completeSpline = new Spline();
@@ -115,149 +89,7 @@ public class OmsiSplineCombinerApp
 
     }
 
-    private static List<HeightProfile> ReadHeightProfile(string[] fileContents)
-    {
-        List<int> positions = FetchPositionsOfAttribute("heightprofile", fileContents);
-        List<HeightProfile> heightProfiles = new List<HeightProfile>(positions.Count);
-        foreach (int position in positions)
-        {
-            var profileData = fileContents.Skip(position + 1).Take(4).ToList();
-            HeightProfile heightProfile = new HeightProfile()
-            {
-                FromX = float.Parse(profileData[0]),
-                ToX = float.Parse(profileData[1]),
-                FromZ = float.Parse(profileData[2]),
-                ToZ = float.Parse(profileData[3]),
-            };
-            heightProfiles.Add(heightProfile);
-        }
-        return heightProfiles;
-    }
-
-    private static List<Texture> ReadTextures(string[] fileContents, string splineFolderPath = "/")
-    {
-        List<int> positions = FetchPositionsOfAttribute("texture", fileContents);
-        List<Texture> textures = new List<Texture>(positions.Count);
-
-        foreach (int position in positions)
-        {
-            var textureContents = fileContents.Skip(position + 1);
-            var data = textureContents.Take(1).ToList();
-            PatchworkChain? patchworkChain = null;
-            var patchworkChainPositions = FetchPositionsOfAttribute("patchwork_chain", textureContents.ToArray());
-            
-            foreach(int patchworkChainPosition in patchworkChainPositions) { 
-                var patchworkChainData = textureContents.Skip(patchworkChainPosition + 1).Take(4).ToList();
-                try
-                {
-                    patchworkChain = new PatchworkChain()
-                    {
-                        SegmentLength = int.Parse(patchworkChainData[0]),
-                        ChainOfTransitions = patchworkChainData[1],
-                        ChainOfWeightFactors = patchworkChainData[2],
-                        Invertable = patchworkChainData[3]
-                    };
-                }
-                catch(FormatException ex)
-                {
-                    Console.WriteLine(ex.Message);
-                    continue;
-                }
-            }
-            Texture texture = new Texture()
-            {
-                Id = 0,
-                Name = data[0],
-                FolderPath = splineFolderPath,
-                PatchworkChain = patchworkChain
-            };
-            textures.Add(texture);
-        }
-
-        return textures;
-    }
-    private static List<OmsiPath> ReadPaths(string[] fileContents)
-    {
-        List<int> positions = FetchPositionsOfAttribute("path", fileContents);
-        List<OmsiPath> paths = new List<OmsiPath>(positions.Count);
-
-        foreach (int position in positions)
-        {
-            var data = fileContents.Skip(position + 1).Take(5).ToList();
-            OmsiPath path = new OmsiPath()
-            {
-                Type = (OmsiPathType)Enum.Parse(typeof(OmsiPathType), data[0]),
-                PositionX = float.Parse(data[1]),
-                PositionZ = float.Parse(data[2]),
-                Width = float.Parse(data[3]),
-                Direction = (OmsiPathDirection)Enum.Parse(typeof(OmsiPathDirection), data[4])
-            };
-            paths.Add(path);
-        }
-        return paths;
-    }
-
-    private static List<Profile> ReadProfiles(string[] fileContents)
-    {
-        List<int> positions = FetchPositionsOfAttribute("profile", fileContents);
-        List<Profile> profiles = new List<Profile>(positions.Count);
-        foreach (int position in positions)
-        {
-            var data = fileContents.Skip(position + 1).Take(1).ToList();
-            var profilePointContents = new List<string>();
-            List<string> profileFileContents = new List<string>();
-            
-            foreach(string line in fileContents.Skip(position + 1).ToList())
-            {
-                if(line.Contains("[profile]"))
-                {
-                    break;
-                }
-                profileFileContents.Add(line);
-            }
-
-            List<ProfilePoint> profilePoints = new List<ProfilePoint>();
-
-            List<int> profilePointsPositions = FetchPositionsOfAttribute("profilepnt", profileFileContents.ToArray());
-
-            foreach (var profilePointPosition in profilePointsPositions)
-            {
-                var profilePointData = profileFileContents.Skip(profilePointPosition + 1).Take(4).ToList();
-                ProfilePoint profilePoint = new ProfilePoint()
-                {
-                    PositionX = float.Parse(profilePointData[0]),
-                    Height = float.Parse(profilePointData[1]),
-                    TexturePositionX = float.Parse(profilePointData[2]),
-                    StretchFactor = float.Parse(profilePointData[3]),
-                };
-                profilePoints.Add(profilePoint);
-            }
-
-
-            Profile profile = new Profile()
-            {
-                TextureId = int.Parse(data[0]),
-                Points = profilePoints
-            };
-            profiles.Add(profile);
-        }
-        return profiles;
-    }
-
-    private static List<int> FetchPositionsOfAttribute(string attribute, string[] fileContents)
-    {
-        var positions = new List<int>();
-
-        for (int i = 0; i < fileContents.Count(); i++)
-        {
-            if (fileContents[i].Trim() == $"[{attribute}]")
-            {
-                positions.Add(i);
-            }
-        }
-
-        return positions;
-    }
+    
 
     private void CopyTextureFile(string path, string destination)
     {
@@ -309,16 +141,39 @@ public class OmsiSplineCombinerApp
         Console.WriteLine($"Enter path to your OMSI directory. Current: {OmsiDirectory}");
         string? omsiPath = Console.ReadLine();
 
+        if(string.IsNullOrEmpty(omsiPath))
+        {
+            omsiPath = OmsiDirectory;
+        }
+
         Console.WriteLine($"Enter path to your splines directory. Current: {SplinesSourceDirectory}");
-        string? splinesSourceDirectory = Console.ReadLine();
+        string? splinesSourceDirectory = Console.ReadLine() ?? SplinesSourceDirectory;
+
+        if (string.IsNullOrEmpty(splinesSourceDirectory))
+        {
+            splinesSourceDirectory = SplinesSourceDirectory;
+        }
 
         Console.WriteLine($"Enter path where new splines will be saved. Current: {DestinationDirectory}");
-        string? desinationDirectory = Console.ReadLine();
+        string? destinationDirectory = Console.ReadLine() ?? DestinationDirectory;
 
+        if (string.IsNullOrEmpty(destinationDirectory))
+        {
+            destinationDirectory = DestinationDirectory;
+        }
+
+
+        File.WriteAllText(AppInfo.ConfigFile, string.Empty);
         var file = File.OpenWrite(AppInfo.ConfigFile);
+        
         using StreamWriter writer = new StreamWriter(file);
-        writer.WriteLine(!string.IsNullOrEmpty(omsiPath) ? omsiPath : OmsiDirectory);
-        writer.WriteLine(!string.IsNullOrEmpty(splinesSourceDirectory) ? splinesSourceDirectory : SplinesSourceDirectory);
-        writer.WriteLine(!string.IsNullOrEmpty(desinationDirectory) ? desinationDirectory : DestinationDirectory);
+        writer.WriteLine(omsiPath);
+        writer.WriteLine(splinesSourceDirectory);
+        writer.WriteLine(destinationDirectory);
+
+        OmsiDirectory = omsiPath;
+        SplinesSourceDirectory = splinesSourceDirectory;
+        DestinationDirectory = destinationDirectory;
+
     }
 }

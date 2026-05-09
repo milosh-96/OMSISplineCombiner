@@ -14,7 +14,7 @@ internal class Program
         catch(Exception ex)
         {
             Console.WriteLine("Something went wrong. Sorry.");
-            File.AppendAllText("log.txt", $"{DateTime.Now}, Message: {ex.Message}, stack trace: {ex.StackTrace} {Environment.NewLine}");
+            File.AppendAllText("log.txt", $"{DateTime.Now}, Message: {ex.Message} {Environment.NewLine}");
         }
     }
 }
