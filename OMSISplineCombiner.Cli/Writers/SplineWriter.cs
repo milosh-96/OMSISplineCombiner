@@ -12,7 +12,7 @@ public static class SplineWriter
     public static void Write(string path, Spline spline)
     {
         var file = File.OpenWrite(path);
-        using StreamWriter writer = new StreamWriter(file);
+        using StreamWriter writer = new StreamWriter(file, AppInfo.GetDefaultEncoding());
         writer.WriteLine($"{new string('-', AppInfo.AppHeader.Length)}\n{AppInfo.AppHeader}\n{new string('-', AppInfo.AppHeader.Length)}\n\n");
         writer.WriteLine(
        string.Join('\n', spline.HeightProfiles.Select(heightProfile => heightProfile.Output())) + '\n'
@@ -34,7 +34,7 @@ public static class SplineWriter
     public static void WriteSplines(string path, List<Spline> splines)
     {
         var file = File.OpenWrite(path);
-        using StreamWriter writer = new StreamWriter(file);
+        using StreamWriter writer = new StreamWriter(file, AppInfo.GetDefaultEncoding());
         writer.WriteLine($"{new string('-', AppInfo.AppHeader.Length)}\n{AppInfo.AppHeader}\n{new string('-', AppInfo.AppHeader.Length)}\n\n");
 
         foreach (var spline in splines)

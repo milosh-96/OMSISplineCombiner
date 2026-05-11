@@ -10,8 +10,8 @@ namespace OMSISplineCombiner.Cli.App;
 
 public class OmsiSplineCombinerApp
 {
-    public string OmsiDirectory { get; set; } = @"C:\Program Files (x86)\Steam\steamapps\common\OMSI 2\";
-    public string SplinesSourceDirectory { get; set; } = @"Splines\";
+    public string OmsiDirectory { get; set; } = @"C:\Program Files (x86)\Steam\steamapps\common\OMSI 2";
+    public string SplinesSourceDirectory { get; set; } = @"Splines";
     public string DestinationDirectory { get; set; } = @"Splines\MySplines";
 
     //private List<string> _files = ["Chodnik_kraweznik_1,5m.sli", "Asfalt_3m.sli", "linia_przerywana.sli"];
@@ -21,7 +21,7 @@ public class OmsiSplineCombinerApp
     {
         LoadConfiguration();
 
-        _files = UserInput.AskForFiles(SplinesSourceDirectory);
+        _files = UserInput.AskForFiles(SplinesSourceDirectory, OmsiDirectory);
 
         List<Texture> textures = new List<Texture>();
 
@@ -64,29 +64,37 @@ public class OmsiSplineCombinerApp
             completeSpline.HeightProfiles.AddRange(spline.HeightProfiles);
             completeSpline.Profiles.AddRange(spline.Profiles);
             completeSpline.Paths.AddRange(spline.Paths);
-            Console.WriteLine('+' +
-                string.Join(',', string.Join(',', spline.Profiles.Select(profile => profile.TextureName))));
+            //Console.WriteLine('+' + string.Join(',', string.Join(',', spline.Profiles.Select(profile => profile.TextureName))));
         }
         completeSpline.Textures.AddRange(textures);
         
         foreach(Texture texture in completeSpline.Textures)
         {
-            EnsureDirectoryExists($"{OmsiDirectory}{DestinationDirectory}\\texture\\{texture}");
-            EnsureDirectoryExists($"{OmsiDirectory}{DestinationDirectory}\\texture\\WinterSnow\\{texture}");
-            EnsureDirectoryExists($"{OmsiDirectory}{DestinationDirectory}\\texture\\WinterSnowfall\\{texture}");
+            EnsureDirectoryExists($"{OmsiDirectory}\\{DestinationDirectory}\\texture\\{texture}");
+            EnsureDirectoryExists($"{OmsiDirectory}\\{DestinationDirectory}\\texture\\WinterSnow\\{texture}");
+            EnsureDirectoryExists($"{OmsiDirectory}\\{DestinationDirectory}\\texture\\WinterSnowfall\\{texture}");
 
-            CopyTextureFile($"{OmsiDirectory}{SplinesSourceDirectory}\\{texture.FolderPath}\\texture\\{texture}", $"{OmsiDirectory}{DestinationDirectory}\\texture\\{texture}");
-            CopyTextureFile($"{OmsiDirectory}{SplinesSourceDirectory}\\{texture.FolderPath}\\texture\\WinterSnow\\{texture}", $"{OmsiDirectory}{DestinationDirectory}\\texture\\WinterSnow\\{texture}");
-            CopyTextureFile($"{OmsiDirectory}{SplinesSourceDirectory}\\{texture.FolderPath}\\texture\\WinterSnowfall\\{texture}", $"{OmsiDirectory}{DestinationDirectory}\\texture\\WinterSnowfall\\{texture}");
+            CopyTextureFile($"{OmsiDirectory}\\{SplinesSourceDirectory}\\{texture.FolderPath}\\texture\\{texture}", $"{OmsiDirectory}\\{DestinationDirectory}\\texture\\{texture}");
+            CopyTextureFile($"{OmsiDirectory}\\{SplinesSourceDirectory}\\{texture.FolderPath}\\texture\\WinterSnow\\{texture}", $"{OmsiDirectory}\\{DestinationDirectory}\\texture\\WinterSnow\\{texture}");
+            CopyTextureFile($"{OmsiDirectory}\\{SplinesSourceDirectory}\\{texture.FolderPath}\\texture\\WinterSnowfall\\{texture}", $"{OmsiDirectory}\\{DestinationDirectory}\\texture\\WinterSnowfall\\{texture}");
         }
 
         //Console.WriteLine(string.Join(',',textures));
-        string newSplinePath = $"{OmsiDirectory}{DestinationDirectory}\\{Guid.NewGuid().ToString()}.sli";
+        string newSplinePath = $"{OmsiDirectory}\\{DestinationDirectory}\\{Guid.NewGuid().ToString()}.sli";
         EnsureDirectoryExists(newSplinePath);
         SplineWriter.Write(newSplinePath, completeSpline);
-        Console.WriteLine(newSplinePath);
-        Console.ReadKey();
-
+        Console.WriteLine($"Exported to {newSplinePath}");
+        Console.WriteLine(new string('*',32));
+        Console.WriteLine("Press N to create a new spline; Press E to exit");
+        ConsoleKeyInfo userInput = Console.ReadKey();
+        if(userInput.Key == ConsoleKey.N)
+        {
+            Run();
+        }
+        else
+        {
+            return;
+        }
     }
 
     

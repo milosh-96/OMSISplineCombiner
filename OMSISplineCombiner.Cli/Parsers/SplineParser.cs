@@ -1,4 +1,5 @@
-﻿using OMSISplineCombiner.Cli.Data;
+﻿using OMSISplineCombiner.Cli.Constants;
+using OMSISplineCombiner.Cli.Data;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -15,7 +16,7 @@ public static class SplineParser
 
         foreach (var file in files)
         {
-            var fileContents = File.ReadAllLines(omsiDirectory + splinesSourceDirectory + '\\' + file).ToArray();
+            var fileContents = File.ReadAllLines(omsiDirectory + "\\" + splinesSourceDirectory + '\\' + file, AppInfo.GetDefaultEncoding()).ToArray();
             var spline = new Spline()
             {
                 HeightProfiles = ReadHeightProfile(fileContents),
@@ -58,7 +59,7 @@ public static class SplineParser
             var data = textureContents.Take(1).ToList();
             PatchworkChain? patchworkChain = null;
             var patchworkChainPositions = FetchPositionsOfAttribute("patchwork_chain", textureContents.ToArray());
-
+            int textureId = 0;
             foreach (int patchworkChainPosition in patchworkChainPositions)
             {
                 var patchworkChainData = textureContents.Skip(patchworkChainPosition + 1).Take(4).ToList();
@@ -78,14 +79,17 @@ public static class SplineParser
                     continue;
                 }
             }
+            //string name = Regex.Match(data[0], @"[^\\\/]+$").Value;
+            string name = data[0];
             Texture texture = new Texture()
             {
-                Id = 0,
-                Name = data[0],
+                Id = textureId,
+                Name = name,
                 FolderPath = splineFolderPath,
                 PatchworkChain = patchworkChain
             };
             textures.Add(texture);
+            textureId++;
         }
 
         return textures;

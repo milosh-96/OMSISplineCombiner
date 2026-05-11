@@ -15,6 +15,7 @@ internal class Program
         {
             Console.WriteLine("Something went wrong. Sorry.");
             File.AppendAllText("log.txt", $"{DateTime.Now}, Message: {ex.Message} {Environment.NewLine}");
+            Console.ReadKey();
         }
     }
 }

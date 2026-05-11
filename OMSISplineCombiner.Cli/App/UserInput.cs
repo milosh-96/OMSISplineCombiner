@@ -7,10 +7,11 @@ using System.Threading.Tasks;
 namespace OMSISplineCombiner.Cli.App;
 public static class UserInput
 {
-    public static List<string> AskForFiles(string splinesSourceDirectory)
+    public static List<string> AskForFiles(string splinesSourceDirectory, string omsiDirectory)
     {
         List<string> files = new List<string>();
         string? input = "";
+        string fullFilePath = omsiDirectory + "\\" + splinesSourceDirectory + "\\" + input;
         do
         {
 
@@ -18,13 +19,23 @@ public static class UserInput
             input = Console.ReadLine();
             if (!string.IsNullOrEmpty(input))
             {
-                if (input.ToLower() != "f")
+                fullFilePath = omsiDirectory + "\\" + splinesSourceDirectory + "\\" + input;
+                if (input.ToLower() == "f")
+                {
+                    break;
+                }
+                if(!File.Exists(fullFilePath))
+                {
+                    Console.WriteLine($"{fullFilePath} doesn't exist.");
+                }
+                else
                 {
                     files.Add(input);
                 }
             }
+            Console.Write($"****\nCurrent files: \n{string.Join('\n', files)}***\n");
         }
-        while (input is null || input.ToLower() != "f");
+        while (string.IsNullOrEmpty(input) || !File.Exists(fullFilePath) ||  input.ToLower() != "f");
         return files;
     }
 }
