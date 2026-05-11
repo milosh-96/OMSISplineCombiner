@@ -70,9 +70,10 @@ public class OmsiSplineCombinerApp
         
         foreach(Texture texture in completeSpline.Textures)
         {
-            EnsureDirectoryExists($"{OmsiDirectory}\\{DestinationDirectory}\\texture\\{texture}");
-            EnsureDirectoryExists($"{OmsiDirectory}\\{DestinationDirectory}\\texture\\WinterSnow\\{texture}");
-            EnsureDirectoryExists($"{OmsiDirectory}\\{DestinationDirectory}\\texture\\WinterSnowfall\\{texture}");
+            string justFileName = Regex.Match(texture.Name, @"[^\\\/]+$").Value;
+            EnsureDirectoryExists($"{OmsiDirectory}\\{DestinationDirectory}\\texture\\{justFileName}");
+            EnsureDirectoryExists($"{OmsiDirectory}\\{DestinationDirectory}\\texture\\WinterSnow\\{justFileName}");
+            EnsureDirectoryExists($"{OmsiDirectory}\\{DestinationDirectory}\\texture\\WinterSnowfall\\{justFileName}");
 
             CopyTextureFile($"{OmsiDirectory}\\{SplinesSourceDirectory}\\{texture.FolderPath}\\texture\\{texture}", $"{OmsiDirectory}\\{DestinationDirectory}\\texture\\{texture}");
             CopyTextureFile($"{OmsiDirectory}\\{SplinesSourceDirectory}\\{texture.FolderPath}\\texture\\WinterSnow\\{texture}", $"{OmsiDirectory}\\{DestinationDirectory}\\texture\\WinterSnow\\{texture}");
