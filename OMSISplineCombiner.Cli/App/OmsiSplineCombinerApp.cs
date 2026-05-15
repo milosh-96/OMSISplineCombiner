@@ -84,8 +84,10 @@ public class OmsiSplineCombinerApp
 
         Console.WriteLine("Press N to create a new spline; Press E to exit");
         ConsoleKeyInfo userInput = Console.ReadKey();
+        Console.WriteLine();
         if(userInput.Key == ConsoleKey.N)
         {
+            Console.WriteLine(new string('*', 25));
             Run();
         }
         else
