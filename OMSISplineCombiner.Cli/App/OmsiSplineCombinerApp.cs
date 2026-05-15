@@ -1,5 +1,6 @@
 ﻿using OMSISplineCombiner.Cli.Constants;
 using OMSISplineCombiner.Cli.Data;
+using OMSISplineCombiner.Cli.Handlers;
 using OMSISplineCombiner.Cli.Parsers;
 using OMSISplineCombiner.Cli.Writers;
 using System.Diagnostics;
@@ -32,30 +33,20 @@ public class OmsiSplineCombinerApp
         {
             var spline = splines[i];
             spline.Textures.ForEach(texture => { if (!textures.Contains(texture)) { textures.Add(texture); } });
-            Console.WriteLine($"Enter the offset for the current spline (#{i + 1})");
-            string? offsetInput = Console.ReadLine();
-            if (offsetInput is null) { throw new ArgumentNullException(nameof(offsetInput)); }
-            float offset = float.Parse(offsetInput);
-            spline.HeightProfiles.ForEach(profile => { profile.FromX += offset; profile.ToX += offset; });
+
+            float xOffset = UserInput.GetXOffset(i + 1);
+            float zOffset = UserInput.GetZOffset(i + 1);
+
             spline.Profiles.ForEach(
                     profile =>
                     {
                         profile.TextureName = spline.Textures[profile.TextureId].Name;
                         Texture? texture = textures.FirstOrDefault(texture => texture.Name == profile.TextureName) ?? throw new InvalidOperationException("Couldn't find a texture.");
                         profile.TextureId = textures.IndexOf(texture);
-                        //if(i > 0)
-                        //{
-                        //    profile.TextureId += 1 + splines[i-1].Profiles.Max(profile=>profile.TextureId);
-                        //}
-                        profile.Points.ForEach(
-                            point => point.PositionX += offset
-                    );
-                    });
-            spline.Paths.ForEach(
-                    path =>
-                    {
-                        path.PositionX += offset;
-                    });
+                    }
+           );
+           spline = SplineHandler.ApplyXOffset(spline, xOffset);
+           spline = SplineHandler.ApplyZOffset(spline, zOffset);
         }
 
         var completeSpline = new Spline();

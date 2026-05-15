@@ -38,4 +38,23 @@ public static class UserInput
         while (string.IsNullOrEmpty(input) || !File.Exists(fullFilePath) ||  input.ToLower() != "f");
         return files;
     }
+    public static float GetXOffset(int splineNumber)
+    {
+        Console.WriteLine($"Enter the X offset for the current spline (#{splineNumber}");
+        string? offsetInput = Console.ReadLine();
+        if (offsetInput is null) { throw new ArgumentNullException(nameof(offsetInput)); }
+        float offset = 0;
+        float.TryParse(offsetInput, out offset);
+        return offset;
+    }
+    public static float GetZOffset(int splineNumber)
+    {
+        Console.WriteLine($"Enter the Z offset for the current spline (#{splineNumber})");
+        string? offsetInput = Console.ReadLine();
+        if (offsetInput is null) { throw new ArgumentNullException(nameof(offsetInput)); }
+        float offset = 0; 
+        float.TryParse(offsetInput, out offset);
+        return offset;
+    }
+
 }
