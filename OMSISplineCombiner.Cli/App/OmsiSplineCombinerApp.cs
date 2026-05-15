@@ -72,11 +72,16 @@ public class OmsiSplineCombinerApp
         }
 
         //Console.WriteLine(string.Join(',',textures));
-        string newSplinePath = $"{OmsiDirectory}\\{DestinationDirectory}\\{Guid.NewGuid().ToString()}.sli";
+        string? userFileName = UserInput.GetFileName();
+        string newSplinePath = $"{OmsiDirectory}\\{DestinationDirectory}\\{(!string.IsNullOrWhiteSpace(userFileName) ? userFileName : Guid.NewGuid().ToString())}.sli";
+        
         EnsureDirectoryExists(newSplinePath);
+        
         SplineWriter.Write(newSplinePath, completeSpline);
+        
         Console.WriteLine($"Exported to {newSplinePath}");
         Console.WriteLine(new string('*',32));
+
         Console.WriteLine("Press N to create a new spline; Press E to exit");
         ConsoleKeyInfo userInput = Console.ReadKey();
         if(userInput.Key == ConsoleKey.N)

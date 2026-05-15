@@ -17,7 +17,7 @@ public static class UserInput
 
             Console.WriteLine($"Enter path to your spline ({splinesSourceDirectory}/...). If you want to repeat one spline multiple times, add them again. Press 'f' if you finished adding splines.");
             input = Console.ReadLine();
-            if (!string.IsNullOrEmpty(input))
+            if (!string.IsNullOrWhiteSpace(input))
             {
                 fullFilePath = omsiDirectory + "\\" + splinesSourceDirectory + "\\" + input;
                 if (input.ToLower() == "f")
@@ -35,12 +35,12 @@ public static class UserInput
             }
             Console.Write($"****\nCurrent files: \n{string.Join('\n', files)}***\n");
         }
-        while (string.IsNullOrEmpty(input) || !File.Exists(fullFilePath) ||  input.ToLower() != "f");
+        while (string.IsNullOrWhiteSpace(input) || !File.Exists(fullFilePath) ||  input.ToLower() != "f");
         return files;
     }
     public static float GetXOffset(int splineNumber)
     {
-        Console.WriteLine($"Enter the X offset for the current spline (#{splineNumber}");
+        Console.WriteLine($"Enter the X offset for the current spline (#{splineNumber})");
         string? offsetInput = Console.ReadLine();
         if (offsetInput is null) { throw new ArgumentNullException(nameof(offsetInput)); }
         float offset = 0;
@@ -57,4 +57,8 @@ public static class UserInput
         return offset;
     }
 
+    public static string? GetFileName() {
+        Console.WriteLine("Enter the file name, leave empty for random name (without .sli):");
+        return Console.ReadLine();
+    }
 }
