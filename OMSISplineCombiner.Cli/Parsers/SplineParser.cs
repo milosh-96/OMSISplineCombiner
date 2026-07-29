@@ -16,17 +16,32 @@ public static class SplineParser
 
         foreach (var file in files)
         {
-            var fileContents = File.ReadAllLines(omsiDirectory + "\\" + splinesSourceDirectory + '\\' + file, AppInfo.GetDefaultEncoding()).ToArray();
-            var spline = new Spline()
+            try
             {
-                HeightProfiles = ReadHeightProfile(fileContents),
-                Textures = ReadTextures(fileContents, Regex.Match(file, @".*(?=[\\/])").Value),
-                Profiles = ReadProfiles(fileContents),
-                Paths = ReadPaths(fileContents)
-            };
-            splines.Add(spline);
+                Spline spline = PrepareSpline(omsiDirectory, splinesSourceDirectory, file);
+                splines.Add(spline);
+            }
+            catch
+            {
+                continue;
+            }
         }
         return splines;
+    }
+
+    public static Spline PrepareSpline(string omsiDirectory, string splinesSourceDirectory, string file)
+    {
+        string filePath = omsiDirectory + "\\" + splinesSourceDirectory + '\\' + file;
+        if(!File.Exists(filePath)) { throw new FileNotFoundException(); }
+        var fileContents = File.ReadAllLines(file, AppInfo.GetDefaultEncoding()).ToArray();
+        var spline = new Spline()
+        {
+            HeightProfiles = ReadHeightProfile(fileContents),
+            Textures = ReadTextures(fileContents, Regex.Match(file, @".*(?=[\\/])").Value),
+            Profiles = ReadProfiles(fileContents),
+            Paths = ReadPaths(fileContents)
+        };
+        return spline;
     }
 
     private static List<HeightProfile> ReadHeightProfile(string[] fileContents)

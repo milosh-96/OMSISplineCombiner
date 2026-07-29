@@ -5,6 +5,8 @@ VisualStudioVersion = 17.14.36705.20
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OMSISplineCombiner.Cli", "OMSISplineCombiner.Cli\OMSISplineCombiner.Cli.csproj", "{CACC735E-36FD-CBB8-EEC6-0A930D663C04}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OmsiSplineCombiner.Tests", "OmsiSplineCombiner.Tests\OmsiSplineCombiner.Tests.csproj", "{CA932B23-DDA9-46C2-A01D-B92A1B19129C}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -15,6 +17,10 @@ Global
 		{CACC735E-36FD-CBB8-EEC6-0A930D663C04}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{CACC735E-36FD-CBB8-EEC6-0A930D663C04}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{CACC735E-36FD-CBB8-EEC6-0A930D663C04}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CA932B23-DDA9-46C2-A01D-B92A1B19129C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CA932B23-DDA9-46C2-A01D-B92A1B19129C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CA932B23-DDA9-46C2-A01D-B92A1B19129C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CA932B23-DDA9-46C2-A01D-B92A1B19129C}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
