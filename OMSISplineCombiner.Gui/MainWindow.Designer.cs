@@ -84,7 +84,7 @@ partial class MainWindow
         ClientSize = new Size(800, 450);
         Controls.Add(flowLayoutPanel1);
         Name = "MainWindow";
-        Text = "Form1";
+        Text = "Omsi";
         ((System.ComponentModel.ISupportInitialize)fileSystemWatcher1).EndInit();
         flowLayoutPanel1.ResumeLayout(false);
         ResumeLayout(false);

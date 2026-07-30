@@ -65,7 +65,7 @@ public static class ProjectsService
                     FileService.EnsureDirectoryExists(Path.Combine(project.OmsiDirectoryPath, project.SplinesOutputPath, "texture\\WinterSnow", justFileName));
                     FileService.EnsureDirectoryExists(Path.Combine(project.OmsiDirectoryPath, project.SplinesOutputPath, "texture\\WinterSnowfall", justFileName));
 
-                    FileService.CopyTextureFile(Path.Combine(project.OmsiDirectoryPath, project.SplinesSourcePath, "texture", justFileName), Path.Combine(project.OmsiDirectoryPath, project.SplinesOutputPath, "texture", texture.ToString()));
+                    FileService.CopyTextureFile(Path.Combine(project.OmsiDirectoryPath, project.SplinesSourcePath, texture.FolderPath, "texture", justFileName), Path.Combine(project.OmsiDirectoryPath, project.SplinesOutputPath, "texture", texture.ToString()));
                     FileService.CopyTextureFile(Path.Combine(project.OmsiDirectoryPath, project.SplinesSourcePath, texture.FolderPath, "texture\\WinterSnow", texture.ToString()), Path.Combine(project.OmsiDirectoryPath, project.SplinesOutputPath, "texture\\WinterSnow", texture.ToString()));
                     FileService.CopyTextureFile(Path.Combine(project.OmsiDirectoryPath, project.SplinesSourcePath, texture.FolderPath, "texture\\WinterSnowfall", texture.ToString()), Path.Combine(project.OmsiDirectoryPath, project.SplinesOutputPath, "texture\\WinterSnowfall", texture.ToString()));
                 }

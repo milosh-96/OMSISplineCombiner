@@ -1,5 +1,6 @@
 using Microsoft.VisualBasic;
 using OMSISplineCombiner.Common;
+using OMSISplineCombiner.Common.Constants;
 using OMSISplineCombiner.Common.Writers;
 
 namespace OMSISplineCombiner.Gui;
@@ -9,6 +10,7 @@ public partial class MainWindow : Form
     public MainWindow()
     {
         InitializeComponent();
+
     }
 
     public string Message { get; set; } = "";
@@ -33,7 +35,7 @@ public partial class MainWindow : Form
 
             if (project.OmsiDirectoryPath is not null && project.SplinesSourcePath is not null && project.SplinesOutputPath is not null)
             {
-                string? userFileName = project.FileName ?? Interaction.InputBox("Enter the file name");
+                string? userFileName = project.FileName ?? Interaction.InputBox("Enter the file name (without .sli)");
                 var completeSpline = ProjectsService.MakeCompleteSpline(project);
                 string newSplinePath = Path.Combine(project.OmsiDirectoryPath, project.SplinesOutputPath, (!string.IsNullOrWhiteSpace(userFileName) ? userFileName : Guid.NewGuid().ToString()) + ".sli");
 
