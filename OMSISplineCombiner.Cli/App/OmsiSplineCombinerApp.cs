@@ -2,6 +2,7 @@
 using OMSISplineCombiner.Cli.Handlers;
 using OMSISplineCombiner.Cli.Parsers;
 using OMSISplineCombiner.Cli.Writers;
+using System.Numerics;
 using System.Text.Json;
 using System.Text.RegularExpressions;
 
@@ -10,6 +11,12 @@ namespace OMSISplineCombiner.Cli.App;
 public class OmsiSplineCombinerApp
 {
     private List<Project> _projects = new();
+    private string? ProjectsFilePath { get; set; }
+
+    public OmsiSplineCombinerApp(string? projectsFilePath)
+    {
+        ProjectsFilePath = projectsFilePath ?? throw new ArgumentNullException(nameof(projectsFilePath));
+    }
 
     public void Run()
     {
@@ -23,6 +30,50 @@ public class OmsiSplineCombinerApp
         foreach(var project in _projects)
         {
 
+            //Console.WriteLine(string.Join(',',textures));
+            string? userFileName = project.FileName ?? UserInput.GetFileName();
+            if (project.OmsiDirectoryPath is not null && project.SplinesSourcePath is not null && project.SplinesOutputPath is not null)
+            {
+                var completeSpline = MakeCompleteSpline(project);
+                string newSplinePath = Path.Combine(project.OmsiDirectoryPath, project.SplinesOutputPath, (!string.IsNullOrWhiteSpace(userFileName) ? userFileName : Guid.NewGuid().ToString()) + ".sli");
+
+                EnsureDirectoryExists(newSplinePath);
+                if (File.Exists(newSplinePath))
+                {
+                    Console.WriteLine("FILE EXISTS! Do you want to overwrite?");
+                    if (Console.ReadLine()?.ToLower() != "y")
+                    {
+                        continue;
+                    }
+                }
+                if (completeSpline is not null) {
+                    SplineWriter.Write(newSplinePath, completeSpline);
+                    Console.WriteLine($"Exported to {newSplinePath}");
+                    Console.WriteLine(new string('*', 32));
+                }
+            }
+
+        }
+
+
+
+        Console.WriteLine("Press N to create a new spline; Press E to exit");
+        ConsoleKeyInfo userInput = Console.ReadKey();
+        Console.WriteLine();
+        if (userInput.Key == ConsoleKey.N)
+        {
+            Console.WriteLine(new string('*', 25));
+            Run();
+        }
+        else
+        {
+            return;
+        }
+    }
+
+    private static Spline? MakeCompleteSpline(Project project)
+    {
+        {
             List<Texture> textures = new List<Texture>();
 
             var files = new List<string>();
@@ -74,55 +125,24 @@ public class OmsiSplineCombinerApp
 
                     CopyTextureFile(Path.Combine(project.OmsiDirectoryPath, project.SplinesSourcePath, "texture", justFileName), Path.Combine(project.OmsiDirectoryPath, project.SplinesOutputPath, "texture", texture.ToString()));
                     CopyTextureFile(Path.Combine(project.OmsiDirectoryPath, project.SplinesSourcePath, texture.FolderPath, "texture\\WinterSnow", texture.ToString()), Path.Combine(project.OmsiDirectoryPath, project.SplinesOutputPath, "texture\\WinterSnow", texture.ToString()));
-                    CopyTextureFile(Path.Combine(project.OmsiDirectoryPath, project.SplinesSourcePath, texture.FolderPath, "texture\\WinterSnowfall",texture.ToString()), Path.Combine(project.OmsiDirectoryPath, project.SplinesOutputPath, "texture\\WinterSnowfall", texture.ToString()));
+                    CopyTextureFile(Path.Combine(project.OmsiDirectoryPath, project.SplinesSourcePath, texture.FolderPath, "texture\\WinterSnowfall", texture.ToString()), Path.Combine(project.OmsiDirectoryPath, project.SplinesOutputPath, "texture\\WinterSnowfall", texture.ToString()));
                 }
-
-                //Console.WriteLine(string.Join(',',textures));
-                string? userFileName = project.FileName ?? UserInput.GetFileName();
-                string newSplinePath = Path.Combine(project.OmsiDirectoryPath, project.SplinesOutputPath,(!string.IsNullOrWhiteSpace(userFileName) ? userFileName : Guid.NewGuid().ToString())+".sli");
-
-                EnsureDirectoryExists(newSplinePath);
-                if(File.Exists(newSplinePath))
-                {
-                    Console.WriteLine("FILE EXISTS! Do you want to overwrite?");
-                    if(Console.ReadLine()?.ToLower() != "y")
-                    {
-                        continue;
-                    }
-                }
-                SplineWriter.Write(newSplinePath, completeSpline);
-                Console.WriteLine($"Exported to {newSplinePath}");
-                Console.WriteLine(new string('*', 32));
-
+                return completeSpline;
             }
         }
-
-
-
-        Console.WriteLine("Press N to create a new spline; Press E to exit");
-        ConsoleKeyInfo userInput = Console.ReadKey();
-        Console.WriteLine();
-        if (userInput.Key == ConsoleKey.N)
-        {
-            Console.WriteLine(new string('*', 25));
-            Run();
-        }
-        else
-        {
-            return;
-        }
+        return null;
     }
 
     private List<Project> LoadProjects()
     {
         var result = new List<Project>();
         List<Project>? projects = JsonSerializer.Deserialize<List<Project>>(
-            File.ReadAllText("test.json"));
+            File.ReadAllText(ProjectsFilePath!));
         if (projects is not null && projects.Count > 0) { result.AddRange(projects); }
         return result;
     }
 
-    private void CopyTextureFile(string path, string destination)
+    private static void CopyTextureFile(string path, string destination)
     {
         if (File.Exists(path))
         {

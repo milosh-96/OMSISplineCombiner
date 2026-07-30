@@ -1,11 +1,15 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 17
-VisualStudioVersion = 17.14.36705.20
+# Visual Studio Version 18
+VisualStudioVersion = 18.8.12009.203 stable
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OMSISplineCombiner.Cli", "OMSISplineCombiner.Cli\OMSISplineCombiner.Cli.csproj", "{CACC735E-36FD-CBB8-EEC6-0A930D663C04}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OmsiSplineCombiner.Tests", "OmsiSplineCombiner.Tests\OmsiSplineCombiner.Tests.csproj", "{CA932B23-DDA9-46C2-A01D-B92A1B19129C}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OMSISplineCombiner.Gui", "OMSISplineCombiner.Gui\OMSISplineCombiner.Gui.csproj", "{C153225B-ED37-47B9-A338-67D95F46356E}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OMSISplineCombiner.Common", "OMSISplineCombiner.Common\OMSISplineCombiner.Common.csproj", "{3E37E992-7E5B-4DFE-83E3-7EB706106A25}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -21,6 +25,14 @@ Global
 		{CA932B23-DDA9-46C2-A01D-B92A1B19129C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{CA932B23-DDA9-46C2-A01D-B92A1B19129C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{CA932B23-DDA9-46C2-A01D-B92A1B19129C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C153225B-ED37-47B9-A338-67D95F46356E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C153225B-ED37-47B9-A338-67D95F46356E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C153225B-ED37-47B9-A338-67D95F46356E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C153225B-ED37-47B9-A338-67D95F46356E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3E37E992-7E5B-4DFE-83E3-7EB706106A25}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3E37E992-7E5B-4DFE-83E3-7EB706106A25}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3E37E992-7E5B-4DFE-83E3-7EB706106A25}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3E37E992-7E5B-4DFE-83E3-7EB706106A25}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

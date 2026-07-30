@@ -14,6 +14,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\OMSISplineCombiner.Cli\OMSISplineCombiner.Cli.csproj" />
+    <ProjectReference Include="..\OMSISplineCombiner.Common\OMSISplineCombiner.Common.csproj" />
   </ItemGroup>
 
   <ItemGroup>

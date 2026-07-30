@@ -8,12 +8,12 @@ internal class Program
     {
         try
         { 
-            var app = new OmsiSplineCombinerApp();
+            var app = new OmsiSplineCombinerApp("test.json");
             app.Run();
         }
         catch(Exception ex)
         {
-            Console.WriteLine("Something went wrong. Sorry.");
+            Console.WriteLine($"Something went wrong. Sorry. {ex.Message}");
             File.AppendAllText("log.txt", $"{DateTime.Now}, Message: {ex.Message} {Environment.NewLine}");
             Console.ReadKey();
         }
