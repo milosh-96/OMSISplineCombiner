@@ -1,13 +1,8 @@
-﻿using OMSISplineCombiner.Cli.Constants;
-using OMSISplineCombiner.Cli.Data;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿using OMSISplineCombiner.Cli.Data;
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 
 namespace OMSISplineCombiner.Cli.Parsers;
+
 public static class SplineParser
 {
     public static List<Spline> GetSplines(List<string> files, string? omsiDirectory, string? splinesSourceDirectory)
