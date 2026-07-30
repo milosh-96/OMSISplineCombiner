@@ -1,6 +1,6 @@
 ﻿namespace OMSISplineCombiner.Common.Data;
 
-internal class Project
+public class Project
 {
     public string? OmsiDirectoryPath { get; set; } = @"C:\Program Files (x86)\Steam\steamapps\common\OMSI 2";
     public string? SplinesSourcePath { get; set; } = "Splines";

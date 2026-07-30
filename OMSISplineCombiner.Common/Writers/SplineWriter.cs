@@ -1,12 +1,7 @@
-﻿using OMSISplineCombiner.Cli.Constants;
-using OMSISplineCombiner.Cli.Data;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using OMSISplineCombiner.Common.Constants;
+using OMSISplineCombiner.Common.Data;
 
-namespace OMSISplineCombiner.Cli.Writers;
+namespace OMSISplineCombiner.Common.Writers;
 public static class SplineWriter
 {
     public static void Write(string path, Spline spline)

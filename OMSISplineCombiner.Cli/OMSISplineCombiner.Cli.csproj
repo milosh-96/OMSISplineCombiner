@@ -15,4 +15,8 @@
     <TreatWarningsAsErrors>True</TreatWarningsAsErrors>
   </PropertyGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\OMSISplineCombiner.Common\OMSISplineCombiner.Common.csproj" />
+  </ItemGroup>
+  
 </Project>

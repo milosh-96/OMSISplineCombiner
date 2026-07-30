@@ -1,4 +1,7 @@
-﻿namespace OMSISplineCombiner.Common.Data;
+﻿using System.Runtime.CompilerServices;
+[assembly: InternalsVisibleTo("OMSISplineCombiner.Cli")]
+
+namespace OMSISplineCombiner.Common.Data;
 
 public class Profile
 {

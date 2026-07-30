@@ -1,12 +1,6 @@
-﻿using OMSISplineCombiner.Cli.Data;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Numerics;
-using System.Text;
-using System.Threading.Tasks;
+﻿using OMSISplineCombiner.Common.Data;
 
-namespace OMSISplineCombiner.Cli.Handlers;
+namespace OMSISplineCombiner.Common.Handlers;
 internal static class SplineHandler
 {
     public static Spline ApplyXOffset(Spline spline, float offset)

@@ -1,7 +1,7 @@
-﻿using OMSISplineCombiner.Cli.Data;
+﻿using OMSISplineCombiner.Common.Data;
 using System.Text.RegularExpressions;
 
-namespace OMSISplineCombiner.Cli.Parsers;
+namespace OMSISplineCombiner.Common.Parsers;
 
 public static class SplineParser
 {

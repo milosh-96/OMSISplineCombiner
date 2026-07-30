@@ -1,6 +1,6 @@
 ﻿using NUnit.Framework;
-using OMSISplineCombiner.Cli.Data;
-using OMSISplineCombiner.Cli.Parsers;
+using OMSISplineCombiner.Common.Data;
+using OMSISplineCombiner.Common.Parsers;
 
 namespace OmsiSplineCombiner.Tests;
 

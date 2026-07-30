@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace OMSISplineCombiner.Cli.Constants;
+namespace OMSISplineCombiner.Common.Constants;
 public static class AppInfo
 {
     public const string Name = "OMSI Spline Combiner";

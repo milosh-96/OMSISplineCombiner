@@ -1,4 +1,6 @@
+using Microsoft.VisualBasic;
 using OMSISplineCombiner.Common;
+using OMSISplineCombiner.Common.Writers;
 
 namespace OMSISplineCombiner.Gui;
 
@@ -18,7 +20,41 @@ public partial class MainWindow : Form
 
     private void openFileDialog1_FileOk(object sender, System.ComponentModel.CancelEventArgs e)
     {
-        Message = openFileDialog1.FileName;
+        var file = openFileDialog1.FileName;
+
+        var projects = ProjectsService.LoadProjects(file);
+
+        //var project = _projects.FirstOrDefault();
+
+
+
+        foreach (var project in projects)
+        {
+
+            if (project.OmsiDirectoryPath is not null && project.SplinesSourcePath is not null && project.SplinesOutputPath is not null)
+            {
+                string? userFileName = project.FileName ?? Interaction.InputBox("Enter the file name");
+                var completeSpline = ProjectsService.MakeCompleteSpline(project);
+                string newSplinePath = Path.Combine(project.OmsiDirectoryPath, project.SplinesOutputPath, (!string.IsNullOrWhiteSpace(userFileName) ? userFileName : Guid.NewGuid().ToString()) + ".sli");
+
+                FileService.EnsureDirectoryExists(newSplinePath);
+                if (File.Exists(newSplinePath))
+                {
+                    var warningMessage = MessageBox.Show("FILE EXISTS! Do you want to overwrite?", "Warning", MessageBoxButtons.YesNo);
+                    if (warningMessage != DialogResult.Yes)
+                    {
+                        continue;
+                    }
+                }
+                if (completeSpline is not null)
+                {
+                    SplineWriter.Write(newSplinePath, completeSpline);
+                    MessageBox.Show($"Exported to {newSplinePath}");
+                }
+            }
+
+        }
+
     }
 
     private void generateProjectFileButtons_Click(object sender, EventArgs e)

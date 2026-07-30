@@ -1,5 +1,5 @@
-﻿namespace OMSISplineCombiner.Common.Data;
-
+﻿
+namespace OMSISplineCombiner.Common.Data;
 public record HeightProfile
 {
     public float FromX { get; set; }
