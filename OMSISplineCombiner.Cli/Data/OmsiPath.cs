@@ -1,6 +1,6 @@
 ﻿namespace OMSISplineCombiner.Cli.Data;
 
-public class OmsiPath
+public record OmsiPath
 {
     public OmsiPathType Type { get; init; } = OmsiPathType.RoadVehicles;
     public float PositionX { get; set; } = 0;

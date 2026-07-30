@@ -10,30 +10,34 @@ using System.Threading.Tasks;
 namespace OMSISplineCombiner.Cli.Parsers;
 public static class SplineParser
 {
-    public static List<Spline> GetSplines(List<string> files, string omsiDirectory, string splinesSourceDirectory)
+    public static List<Spline> GetSplines(List<string> files, string? omsiDirectory, string? splinesSourceDirectory)
     {
         var splines = new List<Spline>();
 
-        foreach (var file in files)
+        if(omsiDirectory is not null &&  splinesSourceDirectory is not null)
         {
-            try
+            foreach (var file in files)
             {
-                Spline spline = PrepareSpline(omsiDirectory, splinesSourceDirectory, file);
+                //try
+                //{
+                //    Spline spline = PrepareSpline(omsiDirectory, splinesSourceDirectory, file);
+                //    splines.Add(spline);
+                //}
+                //catch
+                //{
+                //    continue;
+                //}
+                Spline spline = PrepareSpline(File.ReadAllLines(Path.Combine(omsiDirectory, splinesSourceDirectory,file)), file);
                 splines.Add(spline);
-            }
-            catch
-            {
-                continue;
             }
         }
         return splines;
     }
 
-    public static Spline PrepareSpline(string omsiDirectory, string splinesSourceDirectory, string file)
+    public static Spline PrepareSpline(string[] fileContents, string file)
     {
-        string filePath = omsiDirectory + "\\" + splinesSourceDirectory + '\\' + file;
-        if(!File.Exists(filePath)) { throw new FileNotFoundException(); }
-        var fileContents = File.ReadAllLines(file, AppInfo.GetDefaultEncoding()).ToArray();
+        if(fileContents is null || fileContents.Length == 0) { throw new ArgumentException(); }
+        fileContents = fileContents.ToArray();
         var spline = new Spline()
         {
             HeightProfiles = ReadHeightProfile(fileContents),
@@ -44,7 +48,7 @@ public static class SplineParser
         return spline;
     }
 
-    private static List<HeightProfile> ReadHeightProfile(string[] fileContents)
+    public static List<HeightProfile> ReadHeightProfile(string[] fileContents)
     {
         List<int> positions = FetchPositionsOfAttribute("heightprofile", fileContents);
         List<HeightProfile> heightProfiles = new List<HeightProfile>(positions.Count);
@@ -63,7 +67,7 @@ public static class SplineParser
         return heightProfiles;
     }
 
-    private static List<Texture> ReadTextures(string[] fileContents, string splineFolderPath = "/")
+    public static List<Texture> ReadTextures(string[] fileContents, string splineFolderPath = "/")
     {
         List<int> positions = FetchPositionsOfAttribute("texture", fileContents);
         List<Texture> textures = new List<Texture>(positions.Count);
@@ -95,7 +99,7 @@ public static class SplineParser
                 }
             }
             //string name = Regex.Match(data[0], @"[^\\\/]+$").Value;
-            string name = data[0];
+            string name = data[0].Trim();
             Texture texture = new Texture()
             {
                 Id = textureId,
@@ -109,7 +113,7 @@ public static class SplineParser
 
         return textures;
     }
-    private static List<OmsiPath> ReadPaths(string[] fileContents)
+    public static List<OmsiPath> ReadPaths(string[] fileContents)
     {
         List<int> positions = FetchPositionsOfAttribute("path", fileContents);
         List<OmsiPath> paths = new List<OmsiPath>(positions.Count);
@@ -130,7 +134,7 @@ public static class SplineParser
         return paths;
     }
 
-    private static List<Profile> ReadProfiles(string[] fileContents)
+    public static List<Profile> ReadProfiles(string[] fileContents)
     {
         List<int> positions = FetchPositionsOfAttribute("profile", fileContents);
         List<Profile> profiles = new List<Profile>(positions.Count);
@@ -177,7 +181,7 @@ public static class SplineParser
         return profiles;
     }
 
-    private static List<int> FetchPositionsOfAttribute(string attribute, string[] fileContents)
+    public static List<int> FetchPositionsOfAttribute(string attribute, string[] fileContents)
     {
         var positions = new List<int>();
 

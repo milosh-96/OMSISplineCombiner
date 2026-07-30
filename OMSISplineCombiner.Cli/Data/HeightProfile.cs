@@ -1,6 +1,6 @@
 ﻿namespace OMSISplineCombiner.Cli.Data;
 
-public class HeightProfile
+public record HeightProfile
 {
     public float FromX { get; set; }
     public float ToX { get; set; }

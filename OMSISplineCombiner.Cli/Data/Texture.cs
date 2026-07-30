@@ -32,7 +32,7 @@ public class Texture : IEquatable<Texture>
     }
 }
 
-public class PatchworkChain
+public record PatchworkChain
 {
     public int SegmentLength { get; init; }
     public string ChainOfTransitions { get; init; } = "A";

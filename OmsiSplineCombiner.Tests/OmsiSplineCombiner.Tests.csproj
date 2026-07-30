@@ -16,4 +16,10 @@
     <ProjectReference Include="..\OMSISplineCombiner.Cli\OMSISplineCombiner.Cli.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Update="test-spline1.sli">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
 </Project>

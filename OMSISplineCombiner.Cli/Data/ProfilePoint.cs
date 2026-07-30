@@ -1,6 +1,6 @@
 ﻿namespace OMSISplineCombiner.Cli.Data;
 
-public class ProfilePoint
+public record ProfilePoint
 {
     public float PositionX { get; set; }
     public float Height { get; set; }

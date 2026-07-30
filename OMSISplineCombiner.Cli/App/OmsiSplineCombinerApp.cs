@@ -1,91 +1,108 @@
-﻿using OMSISplineCombiner.Cli.Constants;
-using OMSISplineCombiner.Cli.Data;
+﻿using OMSISplineCombiner.Cli.Data;
 using OMSISplineCombiner.Cli.Handlers;
 using OMSISplineCombiner.Cli.Parsers;
 using OMSISplineCombiner.Cli.Writers;
-using System.Diagnostics;
-using System.IO;
+using System.Text.Json;
 using System.Text.RegularExpressions;
 
 namespace OMSISplineCombiner.Cli.App;
 
 public class OmsiSplineCombinerApp
 {
-    public string OmsiDirectory { get; set; } = @"C:\Program Files (x86)\Steam\steamapps\common\OMSI 2";
-    public string SplinesSourceDirectory { get; set; } = @"Splines";
-    public string DestinationDirectory { get; set; } = @"Splines\MySplines";
-
-    //private List<string> _files = ["Chodnik_kraweznik_1,5m.sli", "Asfalt_3m.sli", "linia_przerywana.sli"];
-    private List<string> _files = new();
+    private List<Project> _projects = new();
 
     public void Run()
     {
-        LoadConfiguration();
+        //LoadConfiguration();
+        _projects = LoadProjects();
 
-        _files = UserInput.AskForFiles(SplinesSourceDirectory, OmsiDirectory);
+        //var project = _projects.FirstOrDefault();
 
-        List<Texture> textures = new List<Texture>();
 
-        var splines = SplineParser.GetSplines(_files, OmsiDirectory, SplinesSourceDirectory);
 
-        // todo: extract stuff from this main method
-        for (int i = 0; i < splines.Count; i++)
+        foreach(var project in _projects)
         {
-            var spline = splines[i];
-            spline.Textures.ForEach(texture => { if (!textures.Contains(texture)) { textures.Add(texture); } });
 
-            float xOffset = UserInput.GetXOffset(i + 1);
-            float zOffset = UserInput.GetZOffset(i + 1);
+            List<Texture> textures = new List<Texture>();
 
-            spline.Profiles.ForEach(
-                    profile =>
+            var files = new List<string>();
+            var splines = new List<Spline>();
+
+            if (project.OmsiDirectoryPath is not null && project.SplinesSourcePath is not null && project.SplinesOutputPath is not null)
+            {
+                files.AddRange(project.SplinesInputs.Select(input => input.Path));
+                //splines.AddRange(SplineParser.GetSplines(files, project.OmsiDirectoryPath, project.SplinesSourcePath));
+
+                foreach (var splineInput in project.SplinesInputs)
+                {
+                    var filePath = Path.Combine(project.OmsiDirectoryPath!, project.SplinesSourcePath!, splineInput.Path);
+                    var spline = SplineParser.PrepareSpline(File.ReadAllLines(filePath), splineInput.Path);
+                    spline.Textures.ForEach(texture => { if (!textures.Contains(texture)) { textures.Add(texture); } });
+
+                    float xOffset = splineInput.Settings.XOffset;
+                    float zOffset = splineInput.Settings.ZOffset;
+
+                    spline.Profiles.ForEach(
+                            profile =>
+                            {
+                                profile.TextureName = spline.Textures[profile.TextureId].Name;
+                                Texture? texture = textures.FirstOrDefault(texture => texture.Name == profile.TextureName) ?? throw new InvalidOperationException("Couldn't find a texture.");
+                                profile.TextureId = textures.IndexOf(texture);
+                            }
+                   );
+                    spline = SplineHandler.ApplyXOffset(spline, xOffset);
+                    spline = SplineHandler.ApplyZOffset(spline, zOffset);
+                    splines.Add(spline);
+                }
+
+                var completeSpline = new Spline();
+                foreach (var spline in splines)
+                {
+                    completeSpline.HeightProfiles.AddRange(spline.HeightProfiles);
+                    completeSpline.Profiles.AddRange(spline.Profiles);
+                    completeSpline.Paths.AddRange(spline.Paths);
+                    //Console.WriteLine('+' + string.Join(',', string.Join(',', spline.Profiles.Select(profile => profile.TextureName))));
+                }
+                completeSpline.Textures.AddRange(textures);
+
+                foreach (Texture texture in completeSpline.Textures)
+                {
+                    string justFileName = Regex.Match(texture.Name, @"[^\\\/]+$").Value;
+                    EnsureDirectoryExists(Path.Combine(project.OmsiDirectoryPath, project.SplinesOutputPath, "texture", justFileName));
+                    EnsureDirectoryExists(Path.Combine(project.OmsiDirectoryPath, project.SplinesOutputPath, "texture\\WinterSnow", justFileName));
+                    EnsureDirectoryExists(Path.Combine(project.OmsiDirectoryPath, project.SplinesOutputPath, "texture\\WinterSnowfall", justFileName));
+
+                    CopyTextureFile(Path.Combine(project.OmsiDirectoryPath, project.SplinesSourcePath, "texture", justFileName), Path.Combine(project.OmsiDirectoryPath, project.SplinesOutputPath, "texture", texture.ToString()));
+                    CopyTextureFile(Path.Combine(project.OmsiDirectoryPath, project.SplinesSourcePath, texture.FolderPath, "texture\\WinterSnow", texture.ToString()), Path.Combine(project.OmsiDirectoryPath, project.SplinesOutputPath, "texture\\WinterSnow", texture.ToString()));
+                    CopyTextureFile(Path.Combine(project.OmsiDirectoryPath, project.SplinesSourcePath, texture.FolderPath, "texture\\WinterSnowfall",texture.ToString()), Path.Combine(project.OmsiDirectoryPath, project.SplinesOutputPath, "texture\\WinterSnowfall", texture.ToString()));
+                }
+
+                //Console.WriteLine(string.Join(',',textures));
+                string? userFileName = project.FileName ?? UserInput.GetFileName();
+                string newSplinePath = Path.Combine(project.OmsiDirectoryPath, project.SplinesOutputPath,(!string.IsNullOrWhiteSpace(userFileName) ? userFileName : Guid.NewGuid().ToString())+".sli");
+
+                EnsureDirectoryExists(newSplinePath);
+                if(File.Exists(newSplinePath))
+                {
+                    Console.WriteLine("FILE EXISTS! Do you want to overwrite?");
+                    if(Console.ReadLine()?.ToLower() != "y")
                     {
-                        profile.TextureName = spline.Textures[profile.TextureId].Name;
-                        Texture? texture = textures.FirstOrDefault(texture => texture.Name == profile.TextureName) ?? throw new InvalidOperationException("Couldn't find a texture.");
-                        profile.TextureId = textures.IndexOf(texture);
+                        continue;
                     }
-           );
-           spline = SplineHandler.ApplyXOffset(spline, xOffset);
-           spline = SplineHandler.ApplyZOffset(spline, zOffset);
+                }
+                SplineWriter.Write(newSplinePath, completeSpline);
+                Console.WriteLine($"Exported to {newSplinePath}");
+                Console.WriteLine(new string('*', 32));
+
+            }
         }
 
-        var completeSpline = new Spline();
-        foreach (var spline in splines)
-        {
-            completeSpline.HeightProfiles.AddRange(spline.HeightProfiles);
-            completeSpline.Profiles.AddRange(spline.Profiles);
-            completeSpline.Paths.AddRange(spline.Paths);
-            //Console.WriteLine('+' + string.Join(',', string.Join(',', spline.Profiles.Select(profile => profile.TextureName))));
-        }
-        completeSpline.Textures.AddRange(textures);
-        
-        foreach(Texture texture in completeSpline.Textures)
-        {
-            string justFileName = Regex.Match(texture.Name, @"[^\\\/]+$").Value;
-            EnsureDirectoryExists($"{OmsiDirectory}\\{DestinationDirectory}\\texture\\{justFileName}");
-            EnsureDirectoryExists($"{OmsiDirectory}\\{DestinationDirectory}\\texture\\WinterSnow\\{justFileName}");
-            EnsureDirectoryExists($"{OmsiDirectory}\\{DestinationDirectory}\\texture\\WinterSnowfall\\{justFileName}");
 
-            CopyTextureFile($"{OmsiDirectory}\\{SplinesSourceDirectory}\\{texture.FolderPath}\\texture\\{texture}", $"{OmsiDirectory}\\{DestinationDirectory}\\texture\\{texture}");
-            CopyTextureFile($"{OmsiDirectory}\\{SplinesSourceDirectory}\\{texture.FolderPath}\\texture\\WinterSnow\\{texture}", $"{OmsiDirectory}\\{DestinationDirectory}\\texture\\WinterSnow\\{texture}");
-            CopyTextureFile($"{OmsiDirectory}\\{SplinesSourceDirectory}\\{texture.FolderPath}\\texture\\WinterSnowfall\\{texture}", $"{OmsiDirectory}\\{DestinationDirectory}\\texture\\WinterSnowfall\\{texture}");
-        }
-
-        //Console.WriteLine(string.Join(',',textures));
-        string? userFileName = UserInput.GetFileName();
-        string newSplinePath = $"{OmsiDirectory}\\{DestinationDirectory}\\{(!string.IsNullOrWhiteSpace(userFileName) ? userFileName : Guid.NewGuid().ToString())}.sli";
-        
-        EnsureDirectoryExists(newSplinePath);
-        
-        SplineWriter.Write(newSplinePath, completeSpline);
-        
-        Console.WriteLine($"Exported to {newSplinePath}");
-        Console.WriteLine(new string('*',32));
 
         Console.WriteLine("Press N to create a new spline; Press E to exit");
         ConsoleKeyInfo userInput = Console.ReadKey();
         Console.WriteLine();
-        if(userInput.Key == ConsoleKey.N)
+        if (userInput.Key == ConsoleKey.N)
         {
             Console.WriteLine(new string('*', 25));
             Run();
@@ -96,14 +113,21 @@ public class OmsiSplineCombinerApp
         }
     }
 
-    
+    private List<Project> LoadProjects()
+    {
+        var result = new List<Project>();
+        List<Project>? projects = JsonSerializer.Deserialize<List<Project>>(
+            File.ReadAllText("test.json"));
+        if (projects is not null && projects.Count > 0) { result.AddRange(projects); }
+        return result;
+    }
 
     private void CopyTextureFile(string path, string destination)
     {
-        if(File.Exists(path))
+        if (File.Exists(path))
         {
             File.Copy(path, destination, true);
-            
+
             var cfgFile = path + ".cfg";
 
             if (File.Exists(cfgFile))
@@ -120,67 +144,5 @@ public class OmsiSplineCombinerApp
         {
             System.IO.Directory.CreateDirectory(fi.DirectoryName!);
         }
-    }
-
-    private void LoadConfiguration()
-    {
-        if(File.Exists(AppInfo.ConfigFile))
-        {
-            var configContents = File.ReadAllLines(AppInfo.ConfigFile).ToArray();
-            if (configContents.Length > 0 && configContents[0] is not null)
-            {
-                OmsiDirectory = configContents[0];
-            }
-            if (configContents.Length > 1 && configContents[1] is not null)
-            {
-                SplinesSourceDirectory = configContents[1];
-            }
-            if (configContents.Length > 2 && configContents[2] is not null)
-            {
-                DestinationDirectory = configContents[2];
-            }
-        }
-        SetConfiguration();
-    }
-
-    private void SetConfiguration()
-    {
-        Console.WriteLine($"Enter path to your OMSI directory. Current: {OmsiDirectory}");
-        string? omsiPath = Console.ReadLine();
-
-        if(string.IsNullOrEmpty(omsiPath))
-        {
-            omsiPath = OmsiDirectory;
-        }
-
-        Console.WriteLine($"Enter path to your splines directory. Current: {SplinesSourceDirectory}");
-        string? splinesSourceDirectory = Console.ReadLine() ?? SplinesSourceDirectory;
-
-        if (string.IsNullOrEmpty(splinesSourceDirectory))
-        {
-            splinesSourceDirectory = SplinesSourceDirectory;
-        }
-
-        Console.WriteLine($"Enter path where new splines will be saved. Current: {DestinationDirectory}");
-        string? destinationDirectory = Console.ReadLine() ?? DestinationDirectory;
-
-        if (string.IsNullOrEmpty(destinationDirectory))
-        {
-            destinationDirectory = DestinationDirectory;
-        }
-
-
-        File.WriteAllText(AppInfo.ConfigFile, string.Empty);
-        var file = File.OpenWrite(AppInfo.ConfigFile);
-        
-        using StreamWriter writer = new StreamWriter(file);
-        writer.WriteLine(omsiPath);
-        writer.WriteLine(splinesSourceDirectory);
-        writer.WriteLine(destinationDirectory);
-
-        OmsiDirectory = omsiPath;
-        SplinesSourceDirectory = splinesSourceDirectory;
-        DestinationDirectory = destinationDirectory;
-
     }
 }
