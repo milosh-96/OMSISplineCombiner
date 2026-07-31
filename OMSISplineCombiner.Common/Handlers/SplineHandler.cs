@@ -1,7 +1,8 @@
 ﻿using OMSISplineCombiner.Common.Data;
+using System.Numerics;
 
 namespace OMSISplineCombiner.Common.Handlers;
-internal static class SplineHandler
+public static class SplineHandler
 {
     public static Spline ApplyXOffset(Spline spline, float offset)
     {
@@ -35,6 +36,24 @@ internal static class SplineHandler
                 {
                     path.PositionZ += offset;
                 });
+        return spline;
+    }
+
+    public static Spline ApplyMirror(Spline spline)
+    { 
+        foreach(var profile in spline.Profiles)
+        {
+            var points = profile.Points;
+            ProfilePoint temp = points[0].ShallowCopy();
+
+            points[0].PositionX = -points[1].PositionX;
+            points[0].TexturePositionX = points[1].TexturePositionX;
+            points[0].Height = points[1].Height;
+
+            points[1].PositionX = -temp.PositionX;
+            points[1].TexturePositionX = temp.TexturePositionX;
+            points[1].Height = temp.Height;
+        }
         return spline;
     }
 }

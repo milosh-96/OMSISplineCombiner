@@ -10,4 +10,5 @@ public class SplineInputSettings
 {
     public float XOffset { get; set; } = 0;
     public float ZOffset { get; set; } = 0;
+    public bool Mirror { get; set; } = false;
 }

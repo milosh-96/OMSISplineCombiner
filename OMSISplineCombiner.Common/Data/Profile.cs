@@ -22,7 +22,6 @@ public class Profile
 
         return $"[profile]\n{TextureId}\n{TextureName}\n{string.Join('\n', pointsOutput)}";
     }
-
     public override int GetHashCode()
     {
         var hash = new HashCode();

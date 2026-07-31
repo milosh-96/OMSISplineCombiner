@@ -43,8 +43,17 @@ public static class ProjectsService
                                 profile.TextureId = textures.IndexOf(texture);
                             }
                    );
+
+                    if (splineInput.Settings.Mirror)
+                    {
+                       spline = SplineHandler.ApplyMirror(spline);
+                    }
+
                     spline = SplineHandler.ApplyXOffset(spline, xOffset);
                     spline = SplineHandler.ApplyZOffset(spline, zOffset);
+
+                   
+
                     splines.Add(spline);
                 }
 
