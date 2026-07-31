@@ -6,7 +6,7 @@ public record OmsiPath
     public float PositionX { get; set; } = 0;
     public float PositionZ { get; set; } = 0;
     public float Width { get; init; } = 3;
-    public OmsiPathDirection Direction { get; init; } = OmsiPathDirection.Forward;
+    public OmsiPathDirection Direction { get; set; } = OmsiPathDirection.Forward;
 
     public string Output() => $"[path]\n{(int)Type}\n{PositionX}\n{PositionZ}\n{Width}\n{(int)Direction}\n";
 

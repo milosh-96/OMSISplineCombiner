@@ -69,4 +69,9 @@ public partial class MainWindow : Form
             MessageBox.Show("File has been saved.", "Success");
         }
     }
+
+    private void MainWindow_Load(object sender, EventArgs e)
+    {
+
+    }
 }

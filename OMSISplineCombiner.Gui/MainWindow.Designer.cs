@@ -45,9 +45,10 @@ partial class MainWindow
         // 
         // browseProjectFileButton
         // 
+        browseProjectFileButton.Font = new Font("Segoe UI", 21.75F, FontStyle.Regular, GraphicsUnit.Point, 0);
         browseProjectFileButton.Location = new Point(3, 3);
         browseProjectFileButton.Name = "browseProjectFileButton";
-        browseProjectFileButton.Size = new Size(242, 23);
+        browseProjectFileButton.Size = new Size(415, 57);
         browseProjectFileButton.TabIndex = 0;
         browseProjectFileButton.Text = "Browse Project File";
         browseProjectFileButton.UseVisualStyleBackColor = true;
@@ -60,9 +61,9 @@ partial class MainWindow
         // 
         // generateProjectFileButtons
         // 
-        generateProjectFileButtons.Location = new Point(251, 3);
+        generateProjectFileButtons.Location = new Point(3, 66);
         generateProjectFileButtons.Name = "generateProjectFileButtons";
-        generateProjectFileButtons.Size = new Size(139, 23);
+        generateProjectFileButtons.Size = new Size(415, 23);
         generateProjectFileButtons.TabIndex = 1;
         generateProjectFileButtons.Text = "Generate Project File";
         generateProjectFileButtons.UseVisualStyleBackColor = true;
@@ -72,16 +73,16 @@ partial class MainWindow
         // 
         flowLayoutPanel1.Controls.Add(browseProjectFileButton);
         flowLayoutPanel1.Controls.Add(generateProjectFileButtons);
-        flowLayoutPanel1.Location = new Point(115, 97);
+        flowLayoutPanel1.Location = new Point(2, 12);
         flowLayoutPanel1.Name = "flowLayoutPanel1";
-        flowLayoutPanel1.Size = new Size(612, 100);
+        flowLayoutPanel1.Size = new Size(433, 115);
         flowLayoutPanel1.TabIndex = 2;
         // 
         // MainWindow
         // 
         AutoScaleDimensions = new SizeF(7F, 15F);
         AutoScaleMode = AutoScaleMode.Font;
-        ClientSize = new Size(800, 450);
+        ClientSize = new Size(447, 145);
         Controls.Add(flowLayoutPanel1);
         Name = "MainWindow";
         Text = "Omsi";

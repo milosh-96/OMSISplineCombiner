@@ -54,6 +54,16 @@ public static class SplineHandler
             points[1].TexturePositionX = temp.TexturePositionX;
             points[1].Height = temp.Height;
         }
+
+        foreach(var path in spline.Paths)
+        {
+            path.PositionX = -path.PositionX;
+            if(path.Direction == OmsiPathDirection.Forward || path.Direction == OmsiPathDirection.Backwards)
+            {
+                path.Direction = path.Direction == OmsiPathDirection.Forward ? OmsiPathDirection.Backwards : OmsiPathDirection.Forward;
+            }   
+        }
+
         return spline;
     }
 }
