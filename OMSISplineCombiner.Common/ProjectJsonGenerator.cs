@@ -7,6 +7,7 @@ public static class ProjectJsonGenerator
 {
     public static string Generate()
     {
+        JsonSerializerOptions options = new() { WriteIndented = true };
         string content = JsonSerializer.Serialize(new List<Project>()
         {
             new()
@@ -34,7 +35,7 @@ public static class ProjectJsonGenerator
                     }
                 }
             }
-        });
+        }, options);
         return content;
     }
 }
