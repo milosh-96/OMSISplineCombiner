@@ -33,6 +33,7 @@ partial class MainWindow
         fileSystemWatcher1 = new FileSystemWatcher();
         generateProjectFileButtons = new Button();
         flowLayoutPanel1 = new FlowLayoutPanel();
+        label1 = new Label();
         saveGeneratedProjectFileDialog = new SaveFileDialog();
         ((System.ComponentModel.ISupportInitialize)fileSystemWatcher1).BeginInit();
         flowLayoutPanel1.SuspendLayout();
@@ -46,9 +47,10 @@ partial class MainWindow
         // browseProjectFileButton
         // 
         browseProjectFileButton.Font = new Font("Segoe UI", 21.75F, FontStyle.Regular, GraphicsUnit.Point, 0);
-        browseProjectFileButton.Location = new Point(3, 3);
+        browseProjectFileButton.Location = new Point(3, 4);
+        browseProjectFileButton.Margin = new Padding(3, 4, 3, 4);
         browseProjectFileButton.Name = "browseProjectFileButton";
-        browseProjectFileButton.Size = new Size(415, 57);
+        browseProjectFileButton.Size = new Size(485, 76);
         browseProjectFileButton.TabIndex = 0;
         browseProjectFileButton.Text = "Browse Project File";
         browseProjectFileButton.UseVisualStyleBackColor = true;
@@ -61,9 +63,10 @@ partial class MainWindow
         // 
         // generateProjectFileButtons
         // 
-        generateProjectFileButtons.Location = new Point(3, 66);
+        generateProjectFileButtons.Location = new Point(3, 88);
+        generateProjectFileButtons.Margin = new Padding(3, 4, 3, 4);
         generateProjectFileButtons.Name = "generateProjectFileButtons";
-        generateProjectFileButtons.Size = new Size(415, 23);
+        generateProjectFileButtons.Size = new Size(485, 31);
         generateProjectFileButtons.TabIndex = 1;
         generateProjectFileButtons.Text = "Generate Project File";
         generateProjectFileButtons.UseVisualStyleBackColor = true;
@@ -73,22 +76,35 @@ partial class MainWindow
         // 
         flowLayoutPanel1.Controls.Add(browseProjectFileButton);
         flowLayoutPanel1.Controls.Add(generateProjectFileButtons);
-        flowLayoutPanel1.Location = new Point(2, 12);
+        flowLayoutPanel1.Location = new Point(12, 13);
+        flowLayoutPanel1.Margin = new Padding(3, 4, 3, 4);
         flowLayoutPanel1.Name = "flowLayoutPanel1";
-        flowLayoutPanel1.Size = new Size(433, 115);
+        flowLayoutPanel1.Size = new Size(488, 144);
         flowLayoutPanel1.TabIndex = 2;
+        // 
+        // label1
+        // 
+        label1.AutoSize = true;
+        label1.Location = new Point(15, 264);
+        label1.Name = "label1";
+        label1.Size = new Size(213, 20);
+        label1.TabIndex = 2;
+        label1.Text = "By Miloš Jovanović - milosh-96";
         // 
         // MainWindow
         // 
-        AutoScaleDimensions = new SizeF(7F, 15F);
+        AutoScaleDimensions = new SizeF(8F, 20F);
         AutoScaleMode = AutoScaleMode.Font;
-        ClientSize = new Size(447, 145);
+        ClientSize = new Size(512, 293);
         Controls.Add(flowLayoutPanel1);
+        Controls.Add(label1);
+        Margin = new Padding(3, 4, 3, 4);
         Name = "MainWindow";
-        Text = "Omsi";
+        Text = "Omsi Spline Combiner";
         ((System.ComponentModel.ISupportInitialize)fileSystemWatcher1).EndInit();
         flowLayoutPanel1.ResumeLayout(false);
         ResumeLayout(false);
+        PerformLayout();
     }
 
     #endregion
@@ -99,4 +115,5 @@ partial class MainWindow
     private FlowLayoutPanel flowLayoutPanel1;
     private Button generateProjectFileButtons;
     private SaveFileDialog saveGeneratedProjectFileDialog;
+    private Label label1;
 }
