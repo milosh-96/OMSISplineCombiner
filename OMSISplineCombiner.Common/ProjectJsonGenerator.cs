@@ -12,7 +12,7 @@ public static class ProjectJsonGenerator
         {
             new()
             {
-                FileName = "my-spline1.sli",
+                FileName = "my-spline1",
                 SplinesInputs = new List<SplineInput>()
                 {
                     new SplineInput()
