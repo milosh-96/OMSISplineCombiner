@@ -13,15 +13,6 @@ public static class SplineParser
         {
             foreach (var file in files)
             {
-                //try
-                //{
-                //    Spline spline = PrepareSpline(omsiDirectory, splinesSourceDirectory, file);
-                //    splines.Add(spline);
-                //}
-                //catch
-                //{
-                //    continue;
-                //}
                 Spline spline = PrepareSpline(File.ReadAllLines(Path.Combine(omsiDirectory, splinesSourceDirectory,file)), file);
                 splines.Add(spline);
             }

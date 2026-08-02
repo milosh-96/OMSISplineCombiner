@@ -1,6 +1,7 @@
 using Microsoft.VisualBasic;
 using OMSISplineCombiner.Common;
 using OMSISplineCombiner.Common.Constants;
+using OMSISplineCombiner.Common.Data;
 using OMSISplineCombiner.Common.Writers;
 using System.Text.Json;
 
@@ -37,11 +38,29 @@ public partial class MainWindow : Form
 
                 if (project.OmsiDirectoryPath is not null && project.SplinesSourcePath is not null && project.SplinesOutputPath is not null)
                 {
-                    string? userFileName = Guid.NewGuid().ToString();
-                    if(string.IsNullOrEmpty(project.FileName))
+                    Spline? completeSpline = null;
+
+                    try
                     {
-                        var inputBox = Interaction.InputBox($"Enter file name (without sli) for spline {currentSplineCount}.", $"Save spline #{currentSplineCount}");
-                        if(!string.IsNullOrEmpty(inputBox))
+                        completeSpline = ProjectsService.MakeCompleteSpline(project);
+                    }
+
+                    catch (FileNotFoundException ex)
+                    {
+                        MessageBox.Show(
+                            $"{ex.Message}. This project (#{currentSplineCount}) will be ignored.",
+                            $"Error (project {currentSplineCount})",
+                            MessageBoxButtons.OK
+                       );
+                        currentSplineCount++;
+                        continue;
+                    }
+
+                    string? userFileName = Guid.NewGuid().ToString();
+                    if (string.IsNullOrEmpty(project.FileName))
+                    {
+                        var inputBox = Interaction.InputBox($"Enter file name (without sli) for spline of the project {currentSplineCount}.", $"Save spline #{currentSplineCount}");
+                        if (!string.IsNullOrEmpty(inputBox))
                         {
                             userFileName = inputBox;
                         }
@@ -50,26 +69,28 @@ public partial class MainWindow : Form
                     {
                         userFileName = project.FileName;
                     }
-                    
-                    var completeSpline = ProjectsService.MakeCompleteSpline(project);
-                    string newSplinePath = Path.Combine(project.OmsiDirectoryPath, project.SplinesOutputPath, (!string.IsNullOrWhiteSpace(userFileName) ? userFileName : Guid.NewGuid().ToString()) + ".sli");
-
-                    FileService.EnsureDirectoryExists(newSplinePath);
-                    if (File.Exists(newSplinePath))
+                    if(completeSpline is not null)
                     {
-                        var warningMessage = MessageBox.Show("FILE EXISTS! Do you want to overwrite?", "Warning", MessageBoxButtons.YesNo);
-                        if (warningMessage != DialogResult.Yes)
+                        string newSplinePath = Path.Combine(project.OmsiDirectoryPath, project.SplinesOutputPath, (!string.IsNullOrWhiteSpace(userFileName) ? userFileName : Guid.NewGuid().ToString()) + ".sli");
+
+                        FileService.EnsureDirectoryExists(newSplinePath);
+                        if (File.Exists(newSplinePath))
                         {
-                            continue;
+                            var warningMessage = MessageBox.Show("FILE EXISTS! Do you want to overwrite?", "Warning", MessageBoxButtons.YesNo);
+                            if (warningMessage != DialogResult.Yes)
+                            {
+                                continue;
+                            }
+                        }
+                        if (completeSpline is not null)
+                        {
+                            SplineWriter.Write(newSplinePath, completeSpline);
+                            MessageBox.Show($"Exported to {newSplinePath}");
                         }
                     }
-                    if (completeSpline is not null)
-                    {
-                        SplineWriter.Write(newSplinePath, completeSpline);
-                        MessageBox.Show($"Exported to {newSplinePath}");
-                    }
+                    currentSplineCount++;
+
                 }
-                currentSplineCount++;
             }
         }
         catch (JsonException ex)
