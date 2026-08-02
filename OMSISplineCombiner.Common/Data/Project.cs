@@ -6,7 +6,7 @@ public class Project
     public string? SplinesSourcePath { get; set; } = "Splines";
     public string? SplinesOutputPath { get; set; } = @"Splines\MySplines";
 
-    public string? FileName { get; set; } = Guid.NewGuid().ToString();
+    public string? FileName { get; set; }
 
     public List<SplineInput> SplinesInputs { get; set; } = new();
 }

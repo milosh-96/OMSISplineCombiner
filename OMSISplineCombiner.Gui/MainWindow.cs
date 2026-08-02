@@ -37,7 +37,20 @@ public partial class MainWindow : Form
 
                 if (project.OmsiDirectoryPath is not null && project.SplinesSourcePath is not null && project.SplinesOutputPath is not null)
                 {
-                    string? userFileName = project.FileName ?? Interaction.InputBox("Enter the file name (without .sli)");
+                    string? userFileName = Guid.NewGuid().ToString();
+                    if(string.IsNullOrEmpty(project.FileName))
+                    {
+                        var inputBox = Interaction.InputBox("Enter file name without sli");
+                        if(!string.IsNullOrEmpty(inputBox))
+                        {
+                            userFileName = inputBox;
+                        }
+                    }
+                    else
+                    {
+                        userFileName = project.FileName;
+                    }
+                    
                     var completeSpline = ProjectsService.MakeCompleteSpline(project);
                     string newSplinePath = Path.Combine(project.OmsiDirectoryPath, project.SplinesOutputPath, (!string.IsNullOrWhiteSpace(userFileName) ? userFileName : Guid.NewGuid().ToString()) + ".sli");
 
