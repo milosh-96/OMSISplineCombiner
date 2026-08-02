@@ -31,7 +31,7 @@ public partial class MainWindow : Form
             var projects = ProjectsService.LoadProjects(file);
 
             //var project = _projects.FirstOrDefault();
-
+            int currentSplineCount = 1;
             foreach (var project in projects)
             {
 
@@ -40,7 +40,7 @@ public partial class MainWindow : Form
                     string? userFileName = Guid.NewGuid().ToString();
                     if(string.IsNullOrEmpty(project.FileName))
                     {
-                        var inputBox = Interaction.InputBox("Enter file name without sli");
+                        var inputBox = Interaction.InputBox($"Enter file name (without sli) for spline {currentSplineCount}.", $"Save spline #{currentSplineCount}");
                         if(!string.IsNullOrEmpty(inputBox))
                         {
                             userFileName = inputBox;
@@ -69,7 +69,7 @@ public partial class MainWindow : Form
                         MessageBox.Show($"Exported to {newSplinePath}");
                     }
                 }
-
+                currentSplineCount++;
             }
         }
         catch (JsonException ex)

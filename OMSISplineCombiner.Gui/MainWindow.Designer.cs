@@ -35,7 +35,6 @@ partial class MainWindow
         flowLayoutPanel1 = new FlowLayoutPanel();
         label1 = new Label();
         saveGeneratedProjectFileDialog = new SaveFileDialog();
-        saveSplineDialog = new SaveFileDialog();
         ((System.ComponentModel.ISupportInitialize)fileSystemWatcher1).BeginInit();
         flowLayoutPanel1.SuspendLayout();
         SuspendLayout();
@@ -92,10 +91,6 @@ partial class MainWindow
         label1.TabIndex = 2;
         label1.Text = "By Miloš Jovanović - milosh-96";
         // 
-        // saveSplineDialog
-        // 
-        saveSplineDialog.Filter = "OMSI Spline|*.sli";
-        // 
         // MainWindow
         // 
         AutoScaleDimensions = new SizeF(8F, 20F);
@@ -121,5 +116,4 @@ partial class MainWindow
     private Button generateProjectFileButtons;
     private SaveFileDialog saveGeneratedProjectFileDialog;
     private Label label1;
-    private SaveFileDialog saveSplineDialog;
 }
