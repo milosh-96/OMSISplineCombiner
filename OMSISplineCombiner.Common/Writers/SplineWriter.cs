@@ -15,8 +15,10 @@ public static class SplineWriter
 
 
         writer.WriteLine(
-          string.Join('\n', spline.Textures.Select(texture => texture.Output())) + '\n'
-          );
+          string.Join('\n', spline.Textures.Select(texture =>
+          {
+              return texture.Output() + '\n' + texture.Material?.Output();
+          })));
         writer.WriteLine(
             string.Join('\n', spline.Profiles.Select(profile => profile.Output())) + '\n'
             );

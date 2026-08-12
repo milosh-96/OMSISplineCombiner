@@ -8,6 +8,8 @@ public class Texture : IEquatable<Texture>
 
     public PatchworkChain? PatchworkChain { get; set; }
 
+    public Material? Material { get; set; }
+
     public override string ToString()
     {
         return Name ?? nameof(Texture);

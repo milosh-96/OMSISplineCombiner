@@ -29,7 +29,8 @@ public static class SplineParser
             HeightProfiles = ReadHeightProfile(fileContents),
             Textures = ReadTextures(fileContents, Regex.Match(file, @".*(?=[\\/])").Value),
             Profiles = ReadProfiles(fileContents),
-            Paths = ReadPaths(fileContents)
+            Paths = ReadPaths(fileContents),
+            Materials = ReadMaterials(fileContents)
         };
         return spline;
     }
@@ -180,5 +181,36 @@ public static class SplineParser
         }
 
         return positions;
+    }
+
+    public static List<Material> ReadMaterials(string[] fileContents)
+    {
+        List<int> positions = FetchPositionsOfAttribute("matl", fileContents);
+        if(!positions.Any())
+        {
+            positions = FetchPositionsOfAttribute("texture", fileContents);
+        }
+
+        List<Material> materials = new List<Material>(positions.Count);
+
+        if (positions.Any())
+        {
+            foreach (int position in positions)
+            {
+                var data = fileContents.Skip(position + 1).ToList();
+                var matlAlphaPositions = FetchPositionsOfAttribute("matl_alpha", fileContents);
+                if(matlAlphaPositions.Any())
+                {
+                    var matlAlphaData = fileContents.Skip(matlAlphaPositions.First() + 1).Take(1).ToList();
+                    Material material = new Material()
+                    {
+                        TextureName = data[0].Trim(),
+                        AlphaValue = (MaterialAlphaValues)Enum.Parse(typeof(MaterialAlphaValues), matlAlphaData[0]),
+                    };
+                    materials.Add(material);
+                }
+            }
+        }
+        return materials;
     }
 }

@@ -6,6 +6,7 @@ public class Spline
     public List<HeightProfile> HeightProfiles = new();
     public List<Profile> Profiles = new();
     public List<OmsiPath> Paths = new();
+    public List<Material> Materials = new();
 
 
     public override string ToString()

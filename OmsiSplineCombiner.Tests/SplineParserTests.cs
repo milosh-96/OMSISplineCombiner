@@ -93,6 +93,39 @@ str_asphdrk_1line.bmp";
     }
 
     [Test]
+    public void ReadMaterials_ShouldParseMaterialsCorrectly()
+    {
+        var data = @"[matl]
+asphalt_1.tga
+
+[matl_alpha]
+2";
+
+        var actual = SplineParser.ReadMaterials(data.Split("\n"));
+        var expected = new List<Material>() {
+            new Material() { TextureName = "asphalt_1.tga", AlphaValue = MaterialAlphaValues.BlendedTransparency }
+        };
+        Assert.AreEqual(expected,actual);
+    }
+
+    [Test]
+    public void ReadMaterials_ShouldParseMaterialsCorrectly_WithoutMatlAttribute()
+    {
+        var data = @"
+[texture]
+asphalt_1.tga
+
+[matl_alpha]
+2";
+
+        var actual = SplineParser.ReadMaterials(data.Split("\n"));
+        var expected = new List<Material>() {
+            new Material() { TextureName = "asphalt_1.tga", AlphaValue = MaterialAlphaValues.BlendedTransparency }
+        };
+        Assert.AreEqual(expected,actual);
+    }
+
+    [Test]
     public void ReadTextures_ShouldParseTexturesWithPatchworkChainCorrectly()
     {
         var data = @"[texture]

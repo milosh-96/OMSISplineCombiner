@@ -52,7 +52,7 @@ public static class ProjectsService
                     spline = SplineHandler.ApplyXOffset(spline, xOffset);
                     spline = SplineHandler.ApplyZOffset(spline, zOffset);
 
-                   
+                    spline = SplineHandler.SyncMaterialsWithTextures(spline);
 
                     splines.Add(spline);
                 }

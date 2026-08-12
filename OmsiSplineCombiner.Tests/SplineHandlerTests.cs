@@ -7,6 +7,21 @@ namespace OmsiSplineCombiner.Tests;
 internal class SplineHandlerTests
 {
     [Test]
+    public void SyncMaterialsWithTextures_ShouldAddMaterialToTexture_IfTextureNamesMatch()
+    {
+        var spline = new Spline()
+        {
+            Textures = new List<Texture>() { new Texture { Name = "test.bmp" } },
+            Materials = new List<Material>() { new Material() { TextureName = "test.bmp", AlphaValue = MaterialAlphaValues.BlendedTransparency } }
+        };
+
+        var expected = new Spline() { Textures = new List<Texture> { new Texture { Name = "test.bmp", Material = new Material() { TextureName = "test.bmp", AlphaValue = MaterialAlphaValues.BlendedTransparency } } } };
+        var actual = SplineHandler.SyncMaterialsWithTextures(spline);
+
+        Assert.AreEqual(expected.Textures.First().Material, actual.Textures.First().Material);
+    }
+
+    [Test]
     public void ApplyMirror_ShouldMirrorProfilePoints()
     {
         // Arrange

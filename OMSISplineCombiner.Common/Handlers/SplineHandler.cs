@@ -4,6 +4,28 @@ using System.Numerics;
 namespace OMSISplineCombiner.Common.Handlers;
 public static class SplineHandler
 {
+    public static Spline SyncMaterialsWithTextures(Spline spline)
+    {
+        if(spline.Materials.Any())
+        {
+            foreach (var texture in spline.Textures)
+            {
+                Material? matchMaterial = null;
+                foreach (var material in spline.Materials)
+                {
+                    if (material.TextureName == texture.Name)
+                    {
+                        matchMaterial = material;
+                    }
+                }
+                if (matchMaterial is not null)
+                {
+                    texture.Material = matchMaterial;
+                }
+            }
+        }
+        return spline;
+    }
     public static Spline ApplyXOffset(Spline spline, float offset)
     {
         spline.HeightProfiles.ForEach(profile => { profile.FromX += offset; profile.ToX += offset; });
