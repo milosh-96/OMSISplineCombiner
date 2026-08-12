@@ -202,6 +202,11 @@ public static class SplineParser
                 if(matlAlphaPositions.Any())
                 {
                     var matlAlphaData = fileContents.Skip(matlAlphaPositions.First() + 1).Take(1).ToList();
+                    int matlAlphaValue = int.Parse(matlAlphaData[0]);
+                    if(matlAlphaValue < 0 || matlAlphaValue > 2)
+                    {
+                        throw new InvalidOperationException("Supported alpha values for [matl_alpha] are: 0, 1 and 2.");
+                    }
                     Material material = new Material()
                     {
                         TextureName = data[0].Trim(),

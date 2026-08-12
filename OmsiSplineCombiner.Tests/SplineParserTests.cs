@@ -125,6 +125,23 @@ asphalt_1.tga
         Assert.AreEqual(expected,actual);
     }
 
+    [TestCase(-1)]
+    [TestCase(-2)]
+    [TestCase(3)]
+    [TestCase(4)]
+    [TestCase(6)]
+    public void ReadMaterials_ShouldThrowException_IfInvalidValue(int alphaValue)
+    {
+        var data = $@"
+[texture]
+asphalt_1.tga
+
+[matl_alpha]
+{alphaValue}";
+
+        Assert.Throws<InvalidOperationException>(() => SplineParser.ReadMaterials(data.Split("\n")));
+    }
+
     [Test]
     public void ReadTextures_ShouldParseTexturesWithPatchworkChainCorrectly()
     {
