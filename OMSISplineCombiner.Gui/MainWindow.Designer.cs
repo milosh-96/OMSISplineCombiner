@@ -33,8 +33,9 @@ partial class MainWindow
         fileSystemWatcher1 = new FileSystemWatcher();
         generateProjectFileButtons = new Button();
         flowLayoutPanel1 = new FlowLayoutPanel();
-        label1 = new Label();
         saveGeneratedProjectFileDialog = new SaveFileDialog();
+        authorLinkLabel = new LinkLabel();
+        versionLabel = new Label();
         ((System.ComponentModel.ISupportInitialize)fileSystemWatcher1).BeginInit();
         flowLayoutPanel1.SuspendLayout();
         SuspendLayout();
@@ -82,22 +83,36 @@ partial class MainWindow
         flowLayoutPanel1.Size = new Size(488, 144);
         flowLayoutPanel1.TabIndex = 2;
         // 
-        // label1
+        // authorLinkLabel
         // 
-        label1.AutoSize = true;
-        label1.Location = new Point(15, 264);
-        label1.Name = "label1";
-        label1.Size = new Size(213, 20);
-        label1.TabIndex = 2;
-        label1.Text = "By Miloš Jovanović - milosh-96";
+        authorLinkLabel.AutoSize = true;
+        authorLinkLabel.Location = new Point(15, 264);
+        authorLinkLabel.Name = "authorLinkLabel";
+        authorLinkLabel.Size = new Size(213, 20);
+        authorLinkLabel.TabIndex = 3;
+        authorLinkLabel.TabStop = true;
+        authorLinkLabel.Text = "By Miloš Jovanović - milosh-96";
+        authorLinkLabel.LinkClicked += authorLinkLabel_LinkClicked;
+        // 
+        // versionLabel
+        // 
+        versionLabel.AutoSize = true;
+        versionLabel.ImageAlign = ContentAlignment.TopLeft;
+        versionLabel.Location = new Point(416, 264);
+        versionLabel.Name = "versionLabel";
+        versionLabel.Size = new Size(50, 20);
+        versionLabel.TabIndex = 4;
+        versionLabel.Text = "label1";
+        versionLabel.TextAlign = ContentAlignment.MiddleRight;
         // 
         // MainWindow
         // 
         AutoScaleDimensions = new SizeF(8F, 20F);
         AutoScaleMode = AutoScaleMode.Font;
         ClientSize = new Size(512, 293);
+        Controls.Add(versionLabel);
+        Controls.Add(authorLinkLabel);
         Controls.Add(flowLayoutPanel1);
-        Controls.Add(label1);
         Margin = new Padding(3, 4, 3, 4);
         Name = "MainWindow";
         Text = "Omsi Spline Combiner";
@@ -115,5 +130,6 @@ partial class MainWindow
     private FlowLayoutPanel flowLayoutPanel1;
     private Button generateProjectFileButtons;
     private SaveFileDialog saveGeneratedProjectFileDialog;
-    private Label label1;
+    private LinkLabel authorLinkLabel;
+    private Label versionLabel;
 }

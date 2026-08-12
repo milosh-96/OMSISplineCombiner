@@ -1,8 +1,9 @@
 using Microsoft.VisualBasic;
 using OMSISplineCombiner.Common;
-using OMSISplineCombiner.Common.Constants;
 using OMSISplineCombiner.Common.Data;
 using OMSISplineCombiner.Common.Writers;
+using OMSISplineCombiner.Gui.Constants;
+using System.Reflection;
 using System.Text.Json;
 
 namespace OMSISplineCombiner.Gui;
@@ -12,7 +13,8 @@ public partial class MainWindow : Form
     public MainWindow()
     {
         InitializeComponent();
-
+        Text += " " + GuiAppInfo.Version;
+        versionLabel.Text = GuiAppInfo.Version;   
     }
 
     public string Message { get; set; } = "";
@@ -69,7 +71,7 @@ public partial class MainWindow : Form
                     {
                         userFileName = project.FileName;
                     }
-                    if(completeSpline is not null)
+                    if (completeSpline is not null)
                     {
                         string newSplinePath = Path.Combine(project.OmsiDirectoryPath, project.SplinesOutputPath, (!string.IsNullOrWhiteSpace(userFileName) ? userFileName : Guid.NewGuid().ToString()) + ".sli");
 
@@ -101,7 +103,7 @@ public partial class MainWindow : Form
                 MessageBoxButtons.RetryCancel
            );
 
-            if(messageBox == DialogResult.Retry)
+            if (messageBox == DialogResult.Retry)
             {
                 openFileDialog1.ShowDialog();
             }
@@ -119,8 +121,12 @@ public partial class MainWindow : Form
         }
     }
 
-    private void MainWindow_Load(object sender, EventArgs e)
+    private void authorLinkLabel_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
     {
-
+        System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo
+        {
+            FileName = "https://m96dev.com/omsilotusdev",
+            UseShellExecute = true // Required in .NET Core / .NET 5+
+        });
     }
 }

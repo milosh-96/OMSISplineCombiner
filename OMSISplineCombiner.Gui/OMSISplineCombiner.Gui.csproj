@@ -6,6 +6,9 @@
     <Nullable>enable</Nullable>
     <UseWindowsForms>true</UseWindowsForms>
     <ImplicitUsings>enable</ImplicitUsings>
+    <AssemblyTitle>OMSI Spline Combiner</AssemblyTitle>
+    <Title>OMSI Spline Combiner</Title>
+    <Product>OMSI Spline Combiner</Product>
   </PropertyGroup>
 
   <ItemGroup>
